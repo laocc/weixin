@@ -39,7 +39,7 @@ final class Fans extends Base
             $api = sprintf($apiBase, $next);
             $info = $this->wx->Request($api);
             if (is_string($info)) {
-                _echo("{$this->wx->AppID}(读取粉丝信息)\t" . $info, 'red');
+                \esp\helper\_echo("{$this->wx->AppID}(读取粉丝信息)\t" . $info, 'red');
                 break;
             }
 

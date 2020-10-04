@@ -17,7 +17,7 @@ final class Pay extends Base
         $val['mch_id'] = '';//商户号
         $val['product_id'] = $shopID;//商家ID
         $val['time_stamp'] = time();
-        $val['nonce_str'] = str_rand(32);
+        $val['nonce_str'] = \esp\helper\str_rand(32);
         $val['sign'] = $this->createSign($val, '');
         $url = 'weixin://wxpay/bizpayurl?' . http_build_query($val);
         //weixin://wxpay/bizpayurl?appid=wx75ff6dd72d5edfcd&mch_id=1446344302&product_id=10&time_stamp=1489919446&nonce_str=93nuLPaVvrwBZ5pUFEGlO2xcyeK4TMSo&sign=24F6731E3C0D203F0474DD5C9FEC501F
@@ -43,7 +43,7 @@ final class Pay extends Base
         $return['result_code'] = 'SUCCESS';
         $return['appid'] = $this->AppID;
         $return['mch_id'] = $this->site['siteMchID'];
-        $return['nonce_str'] = str_rand(32);
+        $return['nonce_str'] = \esp\helper\str_rand(32);
         $return['prepay_id'] = $unified['prepay_id'];
         return $return;
 
@@ -80,7 +80,7 @@ final class Pay extends Base
         $values = array();
         $values['appId'] = $config['appid'];
         $values['timeStamp'] = strval($data['time']);//这timeStamp中间的S必须是大写
-        $values['nonceStr'] = str_rand(30);//随机字符串，不长于32位。推荐随机数生成算法
+        $values['nonceStr'] = \esp\helper\str_rand(30);//随机字符串，不长于32位。推荐随机数生成算法
         $values['package'] = "prepay_id={$unified['prepay_id']}";
         $values['signType'] = 'MD5';
         $values['paySign'] = $this->createSign($values, $config['token']);//生成签名
@@ -123,7 +123,7 @@ final class Pay extends Base
         $rest['partnerid'] = $config['mchid'];//商户号
         $rest['prepayid'] = $unified['prepay_id'];//微信返回的支付交易会话ID
         $rest['package'] = 'Sign=WXPay';
-        $rest['noncestr'] = str_rand(30);//随机数
+        $rest['noncestr'] = \esp\helper\str_rand(30);//随机数
         $rest['timestamp'] = $data['time'];
         $rest['sign'] = $this->createSign($rest, $config['token']);
         return $rest;
@@ -154,10 +154,10 @@ final class Pay extends Base
             'id' => mt_rand(),//订单号
             'subject' => '充值订单',//商品简要说明
             'ip' => _CIP,
-            'nonce_str' => str_rand(15),//随机签名
+            'nonce_str' => \esp\helper\str_rand(15),//随机签名
             'fee' => 1,//金额
             'openid' => '',//OpenID
-            'attach' => str_rand(),////选填 附加数据，在查询API和支付通知中原样返回，该字段主要用于商户携带订单的自定义数据
+            'attach' => \esp\helper\str_rand(),////选填 附加数据，在查询API和支付通知中原样返回，该字段主要用于商户携带订单的自定义数据
             'notify' => ''
         ];
 
@@ -224,7 +224,7 @@ final class Pay extends Base
         } else {
             $data['out_trade_no'] = $ordNumber;
         }
-        $data['nonce_str'] = str_rand(20);
+        $data['nonce_str'] = \esp\helper\str_rand(20);
 //        $data['sign_type'] = 'MD5';
         $data['sign'] = $this->createSign($data, $way['token']);//签名，详见签名生成算法
         $data = $this->xml($data);

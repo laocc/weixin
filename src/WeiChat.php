@@ -330,7 +330,7 @@ final class WeiChat extends Model
         $token = $this->tempCache('Access_Token_V');
         if ($token and $token['expires'] > time()) return $token;
 
-        $api = replace_kv("/cgi-bin/token?grant_type=client_credential&appid={mppAppID}&secret={mppSecret}", $this->mpp);
+        $api = \esp\helper\replace_array("/cgi-bin/token?grant_type=client_credential&appid={mppAppID}&secret={mppSecret}", $this->mpp);
         $dat = $this->Request($api);
         if (is_string($dat)) return $dat;
 

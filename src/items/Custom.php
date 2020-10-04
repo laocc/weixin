@@ -92,7 +92,7 @@ final class Custom extends Send
             $opt['path'] = " data-miniprogram-path='{$option['app']['path']}'";
         }
         if (!empty($option['link']) or !empty($option['app']['appid'])) {
-            $reply['text']['content'] = replace_kv('<a{href}{appid}{path}>{text}</a>', $opt);
+            $reply['text']['content'] = \esp\helper\replace_array('<a{href}{appid}{path}>{text}</a>', $opt);
         } else {
             $reply['text']['content'] = $option['text']['desc'];
         }

@@ -89,7 +89,7 @@ final class Api extends Base
         if (is_string($ticket)) return $ticket;
 
         $arrValue = array();
-        $arrValue['noncestr'] = str_rand(30);
+        $arrValue['noncestr'] = \esp\helper\str_rand(30);
         $arrValue['timestamp'] = $time ?: time();
         $arrValue['jsapi_ticket'] = $ticket['ticket'];
         $arrValue['url'] = $url;
