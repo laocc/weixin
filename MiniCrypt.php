@@ -19,7 +19,6 @@ final class MiniCrypt
         $this->appid = $appid;
     }
 
-
     /**
      * 检验数据的真实性，并且获取解密后的明文.
      * @param $encryptedData string 加密的用户数据
