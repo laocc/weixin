@@ -1,0 +1,7 @@
+*.db
+*.sh
+*.log
+/.idea/
+/vendor/
+/runtime/
+/composer.lock
