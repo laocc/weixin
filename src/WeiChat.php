@@ -13,7 +13,7 @@ use \esp\weixin\items\Menu;
 use \esp\weixin\items\Tag;
 use \esp\weixin\items\Template;
 
- class WeiChat
+abstract class WeiChat
 {
 
     public static function Reply(array $conf)

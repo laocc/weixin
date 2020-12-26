@@ -14,7 +14,7 @@ final class Auth extends Base
      * @param bool $self
      * @return array|string
      */
-    final public function authLoginCode(array $open, string $back, bool $self = true)
+    public function authLoginCode(array $open, string $back, bool $self = true)
     {
         $uri = sprintf($open['openWebApi'], $back);
         $state = md5($open['openWebAppID'] . date('YmdH') . $back);
@@ -34,7 +34,7 @@ final class Auth extends Base
      * @param string $back
      * @return string
      */
-    final public function authGetCodeOpenID(array $app, string $state, string $code, string $back)
+    public function authGetCodeOpenID(array $app, string $state, string $code, string $back)
     {
         if (empty($state)) return 'StateError';
 
@@ -62,7 +62,7 @@ final class Auth extends Base
      * @param $sign
      * @return bool
      */
-    final public function authOpenSignCheck(array $app, string $openID, string $sign)
+    public function authOpenSignCheck(array $app, string $openID, string $sign)
     {
         //这里的sign就是authGetCodeOpenID里最后sprintf中的md5
         if ($sign === md5("{$app['openWebAppID']}/{$openID}/signCodeOpenID")) return true;

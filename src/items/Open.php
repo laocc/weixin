@@ -4,7 +4,6 @@ namespace esp\weixin\items;
 
 
 use esp\weixin\Platform;
-use esp\weixin\Base;
 
 class Open
 {

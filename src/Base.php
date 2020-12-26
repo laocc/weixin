@@ -3,6 +3,8 @@
 namespace esp\weixin;
 
 
+use esp\core\Debug;
+use esp\core\Output;
 use esp\library\ext\Xml;
 
 abstract class Base
@@ -20,7 +22,6 @@ abstract class Base
     public $Nick;
 
     public $Platform;
-    public $resDomain;
 
     protected $Hash;
     protected $redis;
@@ -32,14 +33,6 @@ abstract class Base
         if (!is_dir($this->path)) mkdir($this->path, 0740, true);
         $this->conf = $conf;
         $this->AppID = $conf['appid'];
-    }
-
-    protected function Fans($OpenID)
-    {
-        $api = "/cgi-bin/user/info?access_token={access_token}&openid={$OpenID}&lang=zh_CN";
-        $info = $this->Request($api);
-        if (is_string($info)) return $info;
-        return $info;
     }
 
 
@@ -56,15 +49,37 @@ abstract class Base
      */
     protected function tempCache(string $name, $value = null)
     {
-        $table = $this->Platform ? "PLAT_{$this->Platform->PlatformAppID}" : "APP_{$this->AppID}";
+//        $table = $this->Platform ? "PLAT_{$this->Platform->PlatformAppID}" : "APP_{$this->AppID}";
 
         if (is_null($value)) {
-            return $this->Redis()->hGet($table, "{$name}_{$this->AppID}");
+            if (!is_readable("{$this->path}/{$name}")) return null;
+            $txt = file_get_contents("{$this->path}/{$name}");
+            return unserialize($txt);
         }
+        return file_put_contents("{$this->path}/{$name}", serialize($value)) > 0;
 
-        return $this->Redis()->hSet($table, "{$name}_{$this->AppID}", $value);
+//
+//        if (is_null($value)) {
+//            return $this->Redis()->hGet($table, "{$name}_{$this->AppID}");
+//        }
+//
+//        return $this->Redis()->hSet($table, "{$name}_{$this->AppID}", $value);
     }
 
+
+    /**
+     * @param $val
+     * @param null $prev
+     * @return Debug|bool
+     */
+    public function debug($val, $prev = null)
+    {
+        $debug = Debug::class();
+        if (is_null($debug)) return false;
+        if (is_null($val)) return $debug;
+        $prev = is_null($prev) ? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0] : $prev;
+        return $debug->relay($val, $prev);
+    }
 
     /**
      * @param array $xml

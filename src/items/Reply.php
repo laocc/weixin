@@ -2,7 +2,7 @@
 
 namespace esp\weixin\items;
 
-use esp\core\Input;
+use esp\library\request\Get;
 use esp\weixin\Base;
 
 final class Reply extends Base
@@ -120,7 +120,7 @@ final class Reply extends Base
         if (!empty($data['image']['url'])) {
             $reply['Articles']['item']['PicUrl'] = $data['image']['url'];
         } else {
-            $reply['Articles']['item']['PicUrl'] = $this->resDomain . $data['image']['path'];
+            $reply['Articles']['item']['PicUrl'] = $data['image']['path'];
         }
 
         $reply['Articles']['item']['Url'] = $data['link'];
@@ -181,10 +181,11 @@ final class Reply extends Base
     public function verification()
     {
         if (!isset($_GET["echostr"])) return 'NULL';
-        $echostr = Input::get('echostr');
-        $timestamp = Input::get('timestamp');
-        $signature = Input::get('signature');
-        $nonce = Input::get('nonce');
+        $get = new Get();
+        $echostr = $get->string('echostr');
+        $timestamp = $get->string('timestamp');
+        $signature = $get->string('signature');
+        $nonce = $get->string('nonce');
 
         $tmpArr = [$this->mpp['mppToken'], $timestamp, $nonce];
         sort($tmpArr, SORT_STRING);

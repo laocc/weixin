@@ -12,7 +12,7 @@ final class Api extends Base
      * 获取jsapi_ticket
      * @return bool|mixed|string
      */
-    final private function load_ApiTicket()
+    private function load_ApiTicket()
     {
         $ticket = $this->tempCache('ApiTicket');
         if ($ticket and $ticket['expires'] > time()) return $ticket;

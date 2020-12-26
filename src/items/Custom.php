@@ -179,7 +179,7 @@ final class Custom extends Base implements Send
         $art = [];
         $art['title'] = $data['text']['title'];
         $art['description'] = $data['text']['desc'];
-        $art['picurl'] = $this->resDomain . $data['image']['path'];
+        $art['picurl'] = $data['image']['path'];
         $art['url'] = $data['link'];
 
         $reply = [];
