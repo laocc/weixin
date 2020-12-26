@@ -1,6 +1,6 @@
 <?php
 
-namespace laocc\weixin;
+namespace esp\weixin;
 
 
 final class MiniCrypt

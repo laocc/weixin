@@ -1,7 +1,8 @@
 <?php
 
-namespace laocc\weixin\items;
+namespace esp\weixin\items;
 
+use esp\weixin\Base;
 
 final class Media extends Base
 {
@@ -10,7 +11,7 @@ final class Media extends Base
     public function article($data)
     {
         $api = "/cgi-bin/material/add_news?access_token={access_token}";
-        $rest = $this->wx->Request($api, $data);
+        $rest = $this->Request($api, $data);
         return $rest;
     }
 
@@ -19,7 +20,7 @@ final class Media extends Base
     {
         $api = "/cgi-bin/material/batchget_material?access_token={access_token}";
         $data = ['type' => $type, 'offset' => $index * 20, 'count' => 20];
-        $rest = $this->wx->Request($api, $data);
+        $rest = $this->Request($api, $data);
         return $rest;
     }
 
@@ -28,7 +29,7 @@ final class Media extends Base
     {
         //https://api.weixin.qq.com/cgi-bin/material/get_material?access_token=ACCESS_TOKEN
         $api = "/cgi-bin/material/get_material?access_token={access_token}";
-        $rest = $this->wx->Request($api, ['media_id' => $medIndex]);
+        $rest = $this->Request($api, ['media_id' => $medIndex]);
         return $rest;
     }
 
@@ -55,14 +56,14 @@ final class Media extends Base
             $data['description'] = json_encode($data['description'], 256 | 64);
         }
 
-        $rest = $this->wx->Request($api, $data, $option);
+        $rest = $this->Request($api, $data, $option);
         return $rest;
     }
 
     public function delete($mediaID)
     {
         $api = "/cgi-bin/material/del_material?access_token={access_token}";
-        $rest = $this->wx->Request($api, ['media_id' => $mediaID]);
+        $rest = $this->Request($api, ['media_id' => $mediaID]);
         if (is_string($rest)) return $rest;
         return $rest['errmsg'] === 'ok';
     }

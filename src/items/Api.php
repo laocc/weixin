@@ -1,7 +1,9 @@
 <?php
 
-namespace laocc\weixin\items;
+namespace esp\weixin\items;
 
+
+use esp\weixin\Base;
 
 final class Api extends Base
 {

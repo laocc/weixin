@@ -1,9 +1,10 @@
 <?php
 
-namespace laocc\weixin\items;
+namespace esp\weixin\items;
 
 
-use laocc\weixin\Platform;
+use esp\weixin\Platform;
+use esp\weixin\Base;
 
 final class Fans extends Base
 {
@@ -18,7 +19,7 @@ final class Fans extends Base
     public function load_FansInfo($OpenID)
     {
         $api = "/cgi-bin/user/info?access_token={access_token}&openid={$OpenID}&lang=zh_CN";
-        $info = $this->wx->Request($api);
+        $info = $this->Request($api);
         if (is_string($info)) return $info;
         return $info;
     }
@@ -37,9 +38,9 @@ final class Fans extends Base
         $sumFans = 0;
         while (true) {
             $api = sprintf($apiBase, $next);
-            $info = $this->wx->Request($api);
+            $info = $this->Request($api);
             if (is_string($info)) {
-                \esp\helper\_echo("{$this->wx->AppID}(读取粉丝信息)\t" . $info, 'red');
+                \esp\helper\_echo("{$this->AppID}(读取粉丝信息)\t" . $info, 'red');
                 break;
             }
 
@@ -71,14 +72,14 @@ final class Fans extends Base
     public function get_OpenID_URL(bool $getWayOpenID = false)
     {
 //        $scope = $getUserInfo ? "snsapi_userinfo" : 'snsapi_base';
-        $state = md5(date('Ymd') . $this->wx->AppID);    //state标识 重定向后会带上state参数，开发者可以填写a-zA-Z0-9的参数值
+        $state = md5(date('Ymd') . $this->AppID);    //state标识 重定向后会带上state参数，开发者可以填写a-zA-Z0-9的参数值
 
         //最后要跳回来的页面
         $uri = _HTTP_ . getenv('HTTP_HOST') . getenv('REQUEST_URI');
         $uri_base = urlencode(base64_encode($uri));
 
         $param = [];
-        $param['appid'] = $this->wx->AppID;
+        $param['appid'] = $this->AppID;
         $param['redirect_uri'] = '';
         $param['response_type'] = 'code';
         $param['scope'] = 'snsapi_base';//"snsapi_userinfo" : 'snsapi_base'
@@ -87,20 +88,20 @@ final class Fans extends Base
         $isPay = $getWayOpenID ? 1 : 0;
 
         $time = getenv('REQUEST_TIME_FLOAT') . '.' . mt_rand();
-        $sign = md5($this->wx->AppID . $time . 'OPENID');
-        if ($this->wx->Platform) {
-            if (0) $this->wx->Platform instanceof Platform and 1;
-            $param['component_appid'] = $this->wx->Platform->PlatformAppID;
-            $url = "{$this->wx->Platform->PlatformURL}/user/openid/{$this->wx->AppID}/{$isPay}/{$uri_base}/{$time}/{$sign}/";
+        $sign = md5($this->AppID . $time . 'OPENID');
+        if ($this->Platform) {
+            if (0) $this->Platform instanceof Platform and 1;
+            $param['component_appid'] = $this->Platform->PlatformAppID;
+            $url = "{$this->Platform->PlatformURL}/user/openid/{$this->AppID}/{$isPay}/{$uri_base}/{$time}/{$sign}/";
         } else {
-            $url = "{$this->wx->mpp['mppDomain']}/login/openid/{$this->wx->AppID}/{$isPay}/{$uri_base}/{$time}/{$sign}/";
+            $url = "{$this->mpp['mppDomain']}/login/openid/{$this->AppID}/{$isPay}/{$uri_base}/{$time}/{$sign}/";
         }
 
         $param['redirect_uri'] = $url;
         $args = http_build_query($param);
         $api = "https://open.weixin.qq.com/connect/oauth2/authorize?{$args}#wechat_redirect";
 
-        $this->wx->debug(['appURL' => $uri, 'redirectURL' => $url, 'redirectAPI' => $api, 'param' => $param]);
+        $this->debug(['appURL' => $uri, 'redirectURL' => $url, 'redirectAPI' => $api, 'param' => $param]);
         return $api;
     }
 
@@ -113,7 +114,7 @@ final class Fans extends Base
     public function load_OpenID(bool $getWayOpenID = false)
     {
         //state标识 重定向后会带上state参数，开发者可以填写a-zA-Z0-9的参数值
-        $state = md5(date('Ymd') . $this->wx->AppID);
+        $state = md5(date('Ymd') . $this->AppID);
 
         if (!isset($_GET['code']) or !isset($_GET['state'])) {
 
@@ -123,24 +124,24 @@ final class Fans extends Base
             $isPay = $getWayOpenID ? 1 : 0;
 
             $param = [];
-            $param['appid'] = $this->wx->AppID;
+            $param['appid'] = $this->AppID;
             $param['redirect_uri'] = '';
             $param['response_type'] = 'code';
             $param['scope'] = 'snsapi_base';//"snsapi_userinfo" : 'snsapi_base'
             $param['state'] = $state;
 
-            if ($this->wx->Platform) {
-                if (0) $this->wx->Platform instanceof Platform and 1;
-                $param['component_appid'] = $this->wx->Platform->PlatformAppID;
-                $url = "{$this->wx->Platform->PlatformURL}/user/openid/{$this->wx->AppID}/{$isPay}/{$uri_base}/{$state}/";
+            if ($this->Platform) {
+                if (0) $this->Platform instanceof Platform and 1;
+                $param['component_appid'] = $this->Platform->PlatformAppID;
+                $url = "{$this->Platform->PlatformURL}/user/openid/{$this->AppID}/{$isPay}/{$uri_base}/{$state}/";
             } else {
-                $url = "{$this->wx->mpp['mppDomain']}/login/openid/{$this->wx->AppID}/{$isPay}/{$uri_base}/{$state}/";
+                $url = "{$this->mpp['mppDomain']}/login/openid/{$this->AppID}/{$isPay}/{$uri_base}/{$state}/";
             }
 
             $param['redirect_uri'] = $url;
             $args = http_build_query($param);
             $api = "https://open.weixin.qq.com/connect/oauth2/authorize?{$args}#wechat_redirect";
-            $this->wx->debug(['appURL' => $uri, 'redirectURL' => $url, 'redirectAPI' => $api, 'param' => $param]);
+            $this->debug(['appURL' => $uri, 'redirectURL' => $url, 'redirectAPI' => $api, 'param' => $param]);
             return $api;
         }
 
@@ -150,13 +151,13 @@ final class Fans extends Base
          */
         if ($_GET['state'] !== $state) return "state与传入值不一致";
         $param = [];
-        $param['appid'] = $this->wx->AppID;
-        $param['secret'] = $this->wx->mpp['mppSecret'];
+        $param['appid'] = $this->AppID;
+        $param['secret'] = $this->mpp['mppSecret'];
         $param['code'] = $_GET['code'];
         $param['grant_type'] = 'authorization_code';
         $args = http_build_query($param);
 
-        $content = $this->wx->Request("/sns/oauth2/access_token?{$args}");
+        $content = $this->Request("/sns/oauth2/access_token?{$args}");
         if (!is_array($content)) return $content;
         if (!isset($content['openid'])) return json_encode($content, 256);
         return $content;

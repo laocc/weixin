@@ -1,8 +1,9 @@
 <?php
 
-namespace laocc\weixin\items;
+namespace esp\weixin\items;
 
 use esp\core\Input;
+use esp\weixin\Base;
 
 final class Reply extends Base
 {
@@ -69,7 +70,7 @@ final class Reply extends Base
 
         $reply = $this->_Reply_Template('text');
         $reply['Content'] = ($text);
-        $xml = $this->wx->xml($reply);
+        $xml = $this->xml($reply);
         return $xml;
     }
 
@@ -83,7 +84,7 @@ final class Reply extends Base
     {
         $reply = $this->_Reply_Template('image');
         $reply['Image'] = ['MediaId' => $media_id];
-        $xml = $this->wx->xml($reply);
+        $xml = $this->xml($reply);
         return $xml;
     }
 
@@ -103,7 +104,7 @@ final class Reply extends Base
         if (empty($reply['Music']['HQMusicUrl'])) unset($reply['Music']['HQMusicUrl']);
 
         $reply['Music']['ThumbMediaId'] = $data['image']['id'];
-        $xml = $this->wx->xml($reply);
+        $xml = $this->xml($reply);
         return $xml;
     }
 
@@ -119,11 +120,11 @@ final class Reply extends Base
         if (!empty($data['image']['url'])) {
             $reply['Articles']['item']['PicUrl'] = $data['image']['url'];
         } else {
-            $reply['Articles']['item']['PicUrl'] = $this->wx->resDomain . $data['image']['path'];
+            $reply['Articles']['item']['PicUrl'] = $this->resDomain . $data['image']['path'];
         }
 
         $reply['Articles']['item']['Url'] = $data['link'];
-        $xml = $this->wx->xml($reply);
+        $xml = $this->xml($reply);
         return $xml;
     }
 
@@ -143,7 +144,7 @@ final class Reply extends Base
         }
 
 
-        $xml = $this->wx->xml($reply);
+        $xml = $this->xml($reply);
         return $xml;
     }
 
@@ -151,7 +152,7 @@ final class Reply extends Base
     {
         $reply = $this->_Reply_Template('voice');
         $reply['Voice'] = ['MediaId' => $media_id];
-        $xml = $this->wx->xml($reply);
+        $xml = $this->xml($reply);
         return $xml;
     }
 
@@ -163,7 +164,7 @@ final class Reply extends Base
             'Title' => $option['text']['title'],
             'Description' => $option['text']['desc'],
         ];
-        $xml = $this->wx->xml($reply);
+        $xml = $this->xml($reply);
         return $xml;
     }
 
@@ -185,7 +186,7 @@ final class Reply extends Base
         $signature = Input::get('signature');
         $nonce = Input::get('nonce');
 
-        $tmpArr = [$this->wx->mpp['mppToken'], $timestamp, $nonce];
+        $tmpArr = [$this->mpp['mppToken'], $timestamp, $nonce];
         sort($tmpArr, SORT_STRING);
 
         return (sha1(implode($tmpArr)) === $signature) ? $echostr : 'Fail';
@@ -200,8 +201,8 @@ final class Reply extends Base
     private function _Reply_Template($type = 'text')
     {
         $xml = array();
-        $xml['ToUserName'] = $this->wx->OpenID;
-        $xml['FromUserName'] = $this->wx->mpp['mppRealID'];//系统微信号
+        $xml['ToUserName'] = $this->OpenID;
+        $xml['FromUserName'] = $this->mpp['mppRealID'];//系统微信号
         $xml['CreateTime'] = time();
         $xml['MsgType'] = $type;
         return $xml;

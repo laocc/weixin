@@ -1,6 +1,6 @@
 <?php
 
-namespace laocc\weixin\auth;
+namespace esp\weixin\auth;
 
 /**
  * PKCS7Encoder class

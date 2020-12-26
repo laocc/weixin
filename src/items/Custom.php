@@ -1,10 +1,11 @@
 <?php
 
-namespace laocc\weixin\items;
+namespace esp\weixin\items;
 
-use models\AskModel;
+use esp\weixin\Base;
+use esp\weixin\Send;
 
-final class Custom extends Send
+final class Custom extends Base implements Send
 {
     private $openID;
     private $custom;
@@ -12,7 +13,7 @@ final class Custom extends Send
     public function setFans(string $openID, string $nick)
     {
         $this->openID = $openID;
-        $this->wx->setNick($nick);
+        $this->setNick($nick);
         return $this;
     }
 
@@ -49,7 +50,7 @@ final class Custom extends Send
         }
 
         $api = "/cgi-bin/message/custom/send?access_token={access_token}";
-        $rest = $this->wx->Request($api, $data);
+        $rest = $this->Request($api, $data);
         if (is_string($rest)) return $rest;
         if (strtolower($rest['errmsg']) === 'ok') return true;
         return $rest['errmsg'] ?? ($rest['menuid'] ?? 'OK');
@@ -61,7 +62,7 @@ final class Custom extends Send
     public function post($data)
     {
         $api = "/cgi-bin/message/custom/send?access_token={access_token}";
-        $rest = $this->wx->Request($api, $data);
+        $rest = $this->Request($api, $data);
         if (is_string($rest)) return $rest;
         if (strtolower($rest['errmsg']) === 'ok') return true;
         return $rest['errmsg'] ?? ($rest['menuid'] ?? 'OK');
@@ -178,7 +179,7 @@ final class Custom extends Send
         $art = [];
         $art['title'] = $data['text']['title'];
         $art['description'] = $data['text']['desc'];
-        $art['picurl'] = $this->wx->resDomain . $data['image']['path'];
+        $art['picurl'] = $this->resDomain . $data['image']['path'];
         $art['url'] = $data['link'];
 
         $reply = [];

@@ -1,8 +1,11 @@
 <?php
 
-namespace laocc\weixin\items;
+namespace esp\weixin\items;
 
-final class Template extends Send
+use esp\weixin\Base;
+use esp\weixin\Send;
+
+final class Template extends Base implements Send
 {
 
     private $openID;
@@ -10,7 +13,7 @@ final class Template extends Send
     public function setFans(string $openID, string $nick)
     {
         $this->openID = $openID;
-        $this->wx->setNick($nick);
+        $this->setNick($nick);
         return $this;
     }
 
@@ -37,7 +40,7 @@ final class Template extends Send
         }
 
         $api = "/cgi-bin/message/template/send?access_token={access_token}";
-        $get = $this->wx->Request($api, $value);
+        $get = $this->Request($api, $value);
         if (is_string($get)) return $get;
         if (strtolower($get['errmsg']) === 'ok') return true;
         return $get['errmsg'];
@@ -55,7 +58,7 @@ final class Template extends Send
     {
         $api = "/cgi-bin/template/api_add_template?access_token={access_token}";
         $data = ['template_id_short' => $short];
-        $get = $this->wx->Request($api, $data);
+        $get = $this->Request($api, $data);
         if (is_string($get)) return $get;
         return $get;
     }
@@ -69,7 +72,7 @@ final class Template extends Send
     public function download()
     {
         $api = "/cgi-bin/template/get_all_private_template?access_token={access_token}";
-        $get = $this->wx->Request($api);
+        $get = $this->Request($api);
         if (is_string($get)) return $get;
         return $get['template_list'];
     }
@@ -83,7 +86,7 @@ final class Template extends Send
     public function getIndustry()
     {
         $api = "/cgi-bin/template/get_industry?access_token={access_token}";
-        $get = $this->wx->Request($api);
+        $get = $this->Request($api);
         if (is_string($get)) return $get;
         return $get;
     }
@@ -101,7 +104,7 @@ final class Template extends Send
         $data = [];
         $data['industry_id1'] = $industry1;
         $data['industry_id2'] = $industry2;
-        $get = $this->wx->Request($api, $data);
+        $get = $this->Request($api, $data);
         if (is_string($get)) return $get;
         return $get['errmsg'] === 'ok';
     }
@@ -117,7 +120,7 @@ final class Template extends Send
     {
         $api = "/cgi-bin/template/del_private_template?access_token={access_token}";
         $data = ['template_id' => $tmpID];
-        $get = $this->wx->Request($api, $data);
+        $get = $this->Request($api, $data);
         if (is_string($get)) return $get;
         return $get['errmsg'] === 'ok';
     }

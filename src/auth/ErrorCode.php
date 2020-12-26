@@ -1,11 +1,11 @@
 <?php
 
-namespace laocc\weixin\auth;
+namespace esp\weixin\auth;
 
 
 /**
  * Class ErrorCode
- * @package laocc\weixin\auth
+ * @package esp\weixin\auth
  */
 final class ErrorCode
 {

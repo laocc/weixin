@@ -1,10 +1,65 @@
 <?php
 
-namespace laocc\weixin\items;
+namespace esp\weixin\items;
 
+use function esp\helper\str_rand;
+use esp\weixin\Base;
 
 final class Pay extends Base
 {
+
+
+    public function refundPay(array $payment)
+    {
+
+        if ($payment['notify_url'][0] === '/') $payment['notify_url'] = _HTTP_ . "api." . _HOST . $payment['notify_url'];
+
+
+        $payInfo = array();
+        $payInfo['appid'] = $this->conf['appid'];
+        $payInfo['mch_id'] = $this->conf['mchid'];
+        $payInfo['nonce_str'] = str_rand(15);
+        $payInfo['sign_type'] = 'MD5';
+        $payInfo['transaction_id'] = $payment['transaction_id'];
+        $payInfo['out_trade_no'] = $payment['out_trade_no'];
+        $payInfo['out_refund_no'] = $payment['out_refund_no'];
+        $payInfo['total_fee'] = $payment['total_fee'];
+        $payInfo['refund_fee'] = $payment['refund_fee'];
+        $payInfo['refund_desc'] = $payment['refund_desc'];
+        $payInfo['notify_url'] = $payment['notify_url'];
+        $payInfo['refund_fee_type'] = 'CNY';
+        $payInfo['sign'] = $this->createSign($payInfo, $this->conf['key']);//签名，详见签名生成算法
+
+        $payInfoXml = $this->xml($payInfo);
+        $this->debug([$this->conf, $payInfo, $payInfoXml]);
+
+        $api = 'https://api.mch.weixin.qq.com/secapi/pay/refund';
+        $option = [];
+        $option['encode'] = 'xml';
+        $option['type'] = 'post';
+        $option['cert'] = $this->conf['cert'];
+//        $option['cert'] = ['cert' => $config['cert.cert'], 'key' => $config['cert.key']];
+
+        $content = $this->Request($api, $payInfoXml, $option);
+        $err = "订单退款:";
+
+        if (!is_array($content)) return "{$err}{$content}";
+        if ($content['return_code'] !== 'SUCCESS') return "{$err}{$content['return_msg']}";        //生成支付时错误
+        if ($content['result_code'] !== 'SUCCESS') return "{$err}{$content['err_code_des']}";        //生成支付时错误
+        if (!$this->checkSign($content, $this->conf['key'])) return "{$err}返回签名错误";
+
+        return $content;
+    }
+
+    /**
+     * 解密退款的回报数据
+     * @param string $code
+     * @return string
+     */
+    public function deCodeCryptRefund(string $code)
+    {
+        return openssl_decrypt(base64_decode($code), "AES-256-ECB", md5($this->conf['key']), OPENSSL_RAW_DATA);
+    }
 
 
     /**

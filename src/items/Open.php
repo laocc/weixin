@@ -1,9 +1,10 @@
 <?php
 
-namespace laocc\weixin\items;
+namespace esp\weixin\items;
 
 
-use laocc\weixin\Platform;
+use esp\weixin\Platform;
+use esp\weixin\Base;
 
 class Open
 {

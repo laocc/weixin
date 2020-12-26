@@ -1,9 +1,11 @@
 <?php
 
-namespace laocc\weixin\items;
+namespace esp\weixin\items;
 
+use esp\weixin\Base;
+use esp\weixin\Send;
 
-final class Push extends Send
+final class Push extends Base implements Send
 {
     private $openID;
     private $nick;
@@ -13,7 +15,7 @@ final class Push extends Send
     {
         $this->openID = $openID;
         $this->nick = $nick;
-        $this->wx->setNick($nick);
+        $this->setNick($nick);
         $this->api = "/cgi-bin/message/mass/preview?access_token={access_token}";
         return $this;
     }
@@ -60,7 +62,7 @@ final class Push extends Send
         }
 
         if (_CLI) print_r($send);
-        $JsonStr = $this->wx->Request($this->api, $send);
+        $JsonStr = $this->Request($this->api, $send);
         if (is_string($JsonStr)) return $JsonStr;
 
         return $JsonStr;
