@@ -12,9 +12,15 @@ use \esp\weixin\items\Media;
 use \esp\weixin\items\Menu;
 use \esp\weixin\items\Tag;
 use \esp\weixin\items\Template;
+use \esp\weixin\items\Pay;
 
 abstract class WeiChat
 {
+
+    public static function Pay(array $conf)
+    {
+        return new Pay($conf);
+    }
 
     public static function Reply(array $conf)
     {
