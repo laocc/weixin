@@ -205,7 +205,8 @@ abstract class Base
         $token = $this->tempCache('Access_Token_V');
         if ($token and $token['expires'] > time()) return $token;
 
-        $api = \esp\helper\replace_array("/cgi-bin/token?grant_type=client_credential&appid={mppAppID}&secret={mppSecret}", $this->mpp);
+        $api = sprintf("/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s",
+            $this->conf['appid'], $this->conf['secret']);
         $dat = $this->Request($api);
         if (is_string($dat)) return $dat;
 
@@ -354,7 +355,6 @@ abstract class Base
     {
         return in_array($this->mpp['mppType'], $Disable) ? '公众号没有此接口权限' : false;
     }
-
 
 
     /**
