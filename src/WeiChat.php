@@ -3,6 +3,7 @@
 namespace esp\weixin;
 
 use \esp\weixin\items\Api;
+use esp\weixin\items\App;
 use \esp\weixin\items\Auth;
 use \esp\weixin\items\Custom;
 use \esp\weixin\items\Fans;
@@ -16,6 +17,11 @@ use \esp\weixin\items\Pay;
 
 abstract class WeiChat
 {
+
+    public static function App(array $conf)
+    {
+        return new App($conf);
+    }
 
     public static function Pay(array $conf)
     {
