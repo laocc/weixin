@@ -124,6 +124,7 @@ abstract class Base
 
         $value = Output::request($api, $data, $option);
         $this->debug([$api, $data, $option, $value]);
+        if ($option['encode'] === 'html') return $value;
 
         $check = $this->checkError($value);
         if ($check === 'try_once' and !$hasTry) {
