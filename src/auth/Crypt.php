@@ -46,9 +46,9 @@ final class Crypt
      * @param string $sign
      * @param string $timeStamp
      * @param string $nonce
-     * @return int
+     * @return array
      */
-    public function decode(string $encryptMsg, string $sign, string $timeStamp, string $nonce)
+    public function decode(string $encryptMsg, string $sign, string $timeStamp, string $nonce): array
     {
         if ($this->dataType === 'json') {
             $data = json_decode($encryptMsg, true);
@@ -69,7 +69,7 @@ final class Crypt
         $from_xml = sprintf($format, $encrypt);
 
         $errCode = $this->decryptMsg($sign, $timeStamp, $nonce, $from_xml, $msg);
-        if ($errCode !== 0) return $errCode;
+        if ($errCode !== 0) return ['error' => $errCode];
 
         return $msg;
     }
@@ -166,7 +166,13 @@ XML;
         $result = $pc->decrypt($arrayXML[1], $this->appId);
         if ($result[0] !== 0) return $result[0];
 
-        $msg = $result[1];
+        if ($this->dataType === 'json') {
+            $msg = json_decode($result[1], true);
+
+        } else {
+            $msg = \esp\helper\xml_decode($result[1], true);
+        }
+
         return ErrorCode::$OK;
     }
 
