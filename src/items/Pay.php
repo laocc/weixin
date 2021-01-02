@@ -243,7 +243,7 @@ final class Pay extends Base
         $option = [];
         $option['encode'] = 'xml';
         $option['type'] = 'post';
-        $option['cert'] = ['cert' => $config['cert.cert'], 'key' => $config['cert.key']];
+        $option['cert'] = $config['cert'];
 
         $content = $this->Request($api, $payInfo, $option);
         $err = "统一下单({$type}){$config['appid']}:";
