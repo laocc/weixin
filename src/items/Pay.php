@@ -194,11 +194,8 @@ final class Pay extends Base
      */
     private function UnifiedOrder(string $type, array $data)
     {
-        $config = $this->conf;
-        foreach (['appid', 'mchid', 'token', 'cert.cert', 'cert.key'] as $ck) {
-            if (!isset($config[$ck])) return "缺少{$ck}项";
-        }
         $type = strtoupper($type);
+        $config = $this->conf;
         $this->debug([$type, $config]);
 
         $data += [
