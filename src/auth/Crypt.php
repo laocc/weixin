@@ -6,20 +6,24 @@ namespace esp\weixin\auth;
 final class Crypt
 {
     private $token;
-    private $encodingAesKey;
     private $appId;
+    private $dataType;
+    private $encodingAesKey;
 
     /**
      * WXBizMsgCrypt constructor.
+     * Crypt constructor.
+     * @param string $appId 公众平台的appId
      * @param string $token 公众平台上，开发者设置的token
      * @param string $encodingAesKey 公众平台上，开发者设置的EncodingAESKey
-     * @param string $appId 公众平台的appId
+     * @param string $type 消息格式类型，json或xml
      */
-    public function __construct(string $appId, string $token, string $encodingAesKey)
+    public function __construct(string $appId, string $token, string $encodingAesKey, string $type = 'xml')
     {
+        $this->appId = $appId;
         $this->token = $token;
         $this->encodingAesKey = $encodingAesKey;
-        $this->appId = $appId;
+        $this->dataType = $type;
     }
 
     /**
@@ -42,12 +46,11 @@ final class Crypt
      * @param string $sign
      * @param string $timeStamp
      * @param string $nonce
-     * @param string $type
      * @return int
      */
-    public function decode(string $encryptMsg, string $sign, string $timeStamp, string $nonce, string $type = 'json')
+    public function decode(string $encryptMsg, string $sign, string $timeStamp, string $nonce)
     {
-        if ($type === 'json') {
+        if ($this->dataType === 'json') {
             $data = json_decode($encryptMsg, true);
             $encrypt = $data['Encrypt'];
         } else {
@@ -64,26 +67,6 @@ final class Crypt
 
         $format = "<xml><Encrypt><![CDATA[%s]]></Encrypt></xml>";
         $from_xml = sprintf($format, $encrypt);
-
-        $errCode = $this->decryptMsg($sign, $timeStamp, $nonce, $from_xml, $msg);
-        if ($errCode !== 0) return $errCode;
-
-        return $msg;
-    }
-
-    /**
-     * @param string $encryptMsg
-     * @param string $sign
-     * @param string $timeStamp
-     * @param string $nonce
-     * @return int
-     */
-    public function decode_json(string $encryptMsg, string $sign, string $timeStamp, string $nonce)
-    {
-        $arr = json_decode($encryptMsg, true);
-
-        $format = "<xml><Encrypt><![CDATA[%s]]></Encrypt></xml>";
-        $from_xml = sprintf($format, $arr['Encrypt']);
 
         $errCode = $this->decryptMsg($sign, $timeStamp, $nonce, $from_xml, $msg);
         if ($errCode !== 0) return $errCode;
@@ -120,6 +103,16 @@ final class Crypt
         //生成安全签名
         $arraySign = $this->getSHA1($this->token, $timeStamp, $nonce, $arrayEncrypt[1]);
         if ($arraySign[0] !== 0) return $arraySign[0];
+
+        if ($this->dataType === 'json') {
+            $data = [];
+            $data['Encrypt'] = $arrayEncrypt[1];
+            $data['MsgSignature'] = $arraySign[1];
+            $data['TimeStamp'] = $timeStamp;
+            $data['Nonce'] = $nonce;
+            $encryptMsg = json_encode($data, 256 | 64);
+            return ErrorCode::$OK;
+        }
 
         $xml = <<<XML
 <xml>
