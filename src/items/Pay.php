@@ -11,9 +11,7 @@ final class Pay extends Base
 
     public function refundPay(array $payment)
     {
-
         if ($payment['notify_url'][0] === '/') $payment['notify_url'] = _HTTP_ . "api." . _HOST . $payment['notify_url'];
-
 
         $payInfo = array();
         $payInfo['appid'] = $this->conf['appid'];
@@ -121,38 +119,37 @@ final class Pay extends Base
     /**
      * H5调起支付API
      * @param array $data
-     * @param array $config
      * @return array|bool|mixed|string
      */
-    public function getJsApiPay(array $data, array $config)
+    public function getJsApiPay(array $data)
     {
-        $unified = $this->UnifiedOrder('JSAPI', $data, $config);//统一下单
+        $unified = $this->UnifiedOrder('JSAPI', $data);//统一下单
         if (is_string($unified)) {
-            $this->debug(['JSAPI.统一下单异常：', $data, $config])->error($unified);
+            $this->debug(['JSAPI.统一下单异常：', $data, $this->conf])->error($unified);
             return $unified;
         }
 
         $values = array();
-        $values['appId'] = $config['appid'];
+        $values['appId'] = $this->conf['appid'];
         $values['timeStamp'] = strval($data['time']);//这timeStamp中间的S必须是大写
         $values['nonceStr'] = str_rand(30);//随机字符串，不长于32位。推荐随机数生成算法
         $values['package'] = "prepay_id={$unified['prepay_id']}";
         $values['signType'] = 'MD5';
-        $values['paySign'] = $this->createSign($values, $config['token']);//生成签名
+        $values['paySign'] = $this->createSign($values, $this->conf['token']);//生成签名
         return $values;
     }
 
-    public function getH5Pay(array $data, array $config)
+    public function getH5Pay(array $data)
     {
-        $unified = $this->UnifiedOrder('MWEB', $data, $config);//统一下单
+        $unified = $this->UnifiedOrder('MWEB', $data);//统一下单
         if (is_string($unified)) {
-            $this->debug(['MWEB.统一下单异常：', $data, $config])->error($unified);
+            $this->debug(['MWEB.统一下单异常：', $data, $this->conf])->error($unified);
             return $unified;
         }
 
         $values = array();
-        $values['appid'] = $config['appid'];
-        $values['partnerid'] = $config['mchid'];//商户号
+        $values['appid'] = $this->conf['appid'];
+        $values['partnerid'] = $this->conf['mchid'];//商户号
         $values['prepayid'] = $unified['prepay_id'];
         $values['mweb_url'] = $unified['mweb_url'];
         return $values;
@@ -162,25 +159,24 @@ final class Pay extends Base
     /**
      * 调起APP支付
      * @param array $data
-     * @param null $config
      * @return array|bool|mixed|string
      */
-    public function getAppPay(array $data, array $config)
+    public function getAppPay(array $data)
     {
-        $unified = $this->UnifiedOrder('APP', $data, $config);//统一下单
+        $unified = $this->UnifiedOrder('APP', $data);//统一下单
         if (is_string($unified)) {
-            $this->debug(['APP.统一下单异常：', $data, $config])->error($unified);
+            $this->debug(['APP.统一下单异常：', $data, $this->conf])->error($unified);
             return $unified;
         }
 
         $rest = [];
-        $rest['appid'] = $config['appid'];
-        $rest['partnerid'] = $config['mchid'];//商户号
+        $rest['appid'] = $this->conf['appid'];
+        $rest['partnerid'] = $this->conf['mchid'];//商户号
         $rest['prepayid'] = $unified['prepay_id'];//微信返回的支付交易会话ID
         $rest['package'] = 'Sign=WXPay';
         $rest['noncestr'] = str_rand(30);//随机数
         $rest['timestamp'] = $data['time'];
-        $rest['sign'] = $this->createSign($rest, $config['token']);
+        $rest['sign'] = $this->createSign($rest, $this->conf['token']);
         return $rest;
     }
 
@@ -189,7 +185,6 @@ final class Pay extends Base
      * 统一下单
      * @param array $data
      * @param string $type
-     * @param $config
      * @return bool|mixed|string
      * https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_1
      * https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_1
@@ -197,8 +192,9 @@ final class Pay extends Base
      * 绑定域名
      * https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=7_3
      */
-    private function UnifiedOrder(string $type, array $data, array $config = [])
+    private function UnifiedOrder(string $type, array $data)
     {
+        $config = $this->conf;
         foreach (['appid', 'mchid', 'token', 'cert.cert', 'cert.key'] as $ck) {
             if (!isset($config[$ck])) return "缺少{$ck}项";
         }
