@@ -257,16 +257,17 @@ final class Pay extends Base
 
     /**
      * 查询订单
-     * @param array $way
      * @param string $ordNumber
-     * @return string|array
+     * @param string|null $ordTansID
+     * @return array|string
+     * @throws \Exception
      */
-    public function orderQuery(array $way, string $ordNumber, string $ordTansID = null)
+    public function orderQuery(string $ordNumber, string $ordTansID = null)
     {
         $api = 'https://api.mch.weixin.qq.com/pay/orderquery';
         $data = [];
-        $data['appid'] = $way['appid'];
-        $data['mch_id'] = $way['mchid'];
+        $data['appid'] = $this->conf['appid'];
+        $data['mch_id'] = $this->conf['mchid'];
         if ($ordTansID) {
             $data['transaction_id'] = $ordTansID;
         } else {
@@ -274,7 +275,7 @@ final class Pay extends Base
         }
         $data['nonce_str'] = str_rand(20);
 //        $data['sign_type'] = 'MD5';
-        $data['sign'] = $this->createSign($data, $way['token']);//签名，详见签名生成算法
+        $data['sign'] = $this->createSign($data, $this->conf['token']);//签名，详见签名生成算法
         $data = $this->xml($data);
 
         $option = [];
@@ -285,7 +286,7 @@ final class Pay extends Base
         if (!is_array($content)) return 'Q:订单查询-' . $content;
         if ($content['return_code'] !== 'SUCCESS') return 'Q:订单查询-' . $content['return_msg'];        //生成支付时错误
         if ($content['result_code'] !== 'SUCCESS') return 'Q:订单查询-' . $content['err_code_des'];        //生成支付时错误
-        if (!$this->checkSign($content, $way['token'])) return 'Q:订单查询-返回签名错误';
+        if (!$this->checkSign($content, $this->conf['token'])) return 'Q:订单查询-返回签名错误';
 
         $this->debug($content);
 
