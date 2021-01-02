@@ -1,4 +1,5 @@
 <?php
+
 namespace esp\weixin\auth;
 
 
@@ -41,18 +42,24 @@ final class Crypt
      * @param string $sign
      * @param string $timeStamp
      * @param string $nonce
+     * @param string $type
      * @return int
      */
-    public function decode(string $encryptMsg, string $sign, string $timeStamp, string $nonce)
+    public function decode(string $encryptMsg, string $sign, string $timeStamp, string $nonce, string $type = 'json')
     {
-        $xml = new \DOMDocument();
-        $xml->loadXML($encryptMsg);
-        $Encrypt = $xml->getElementsByTagName('Encrypt');
-        $encrypt = $Encrypt->item(0)->nodeValue;
+        if ($type === 'json') {
+            $data = json_decode($encryptMsg, true);
+            $encrypt = $data['Encrypt'];
+        } else {
+            $xml = new \DOMDocument();
+            $xml->loadXML($encryptMsg);
+            $Encrypt = $xml->getElementsByTagName('Encrypt');
+            $encrypt = $Encrypt->item(0)->nodeValue;
 
-        if (is_null($sign)) {
-            $Encrypt = $xml->getElementsByTagName('MsgSignature');
-            $sign = $Encrypt->item(0)->nodeValue;
+            if (is_null($sign)) {
+                $Encrypt = $xml->getElementsByTagName('MsgSignature');
+                $sign = $Encrypt->item(0)->nodeValue;
+            }
         }
 
         $format = "<xml><Encrypt><![CDATA[%s]]></Encrypt></xml>";
