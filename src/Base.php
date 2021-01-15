@@ -28,7 +28,9 @@ abstract class Base
 
     public function __construct(array $conf)
     {
-        if (!isset($conf['appid'])) throw new \Error("wx conf 至少要含有appid");
+        if (!isset($conf['appid']) or empty($conf['appid'])) {
+            throw new \Error("wx conf 至少要含有appid:" . json_encode($conf, 256 | 64));
+        }
         $this->path = "/tmp/wx/{$conf['appid']}";
         if (!is_dir($this->path)) mkdir($this->path, 0740, true);
         $this->conf = $conf;
