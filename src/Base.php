@@ -114,7 +114,7 @@ abstract class Base
         }
         if ($api[0] !== 'h') $api = "{$this->host}{$api}";
 
-        $request = (new Http($option))->data($data)->encode('json')->post($api);
+        $request = (new Http($option))->data($data)->post($api);
 
         $this->debug([$api, $data, $option, $request]);
         if ($option['encode'] === 'html') return $request->html();
@@ -150,7 +150,7 @@ abstract class Base
      */
     final protected function checkError(array $inArr, array $allowCode = [])
     {
-        if ($inArr["error"]) return $inArr['message'];
+        if (isset($inArr["error"]) && $inArr["error"]) return $inArr['message'];
         if (!isset($inArr["errcode"])) return true;
         $errCode = intval($inArr["errcode"]);
 
