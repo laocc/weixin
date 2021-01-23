@@ -6,9 +6,9 @@ use esp\core\db\Redis;
 use esp\core\Input;
 use esp\core\Model;
 use esp\core\Output;
+use esp\http\Http;
 use esp\weixin\items\Open;
 use esp\weixin\auth\Crypt;
-use models\MppModel;
 
 final class Platform extends Model
 {
@@ -590,7 +590,7 @@ final class Platform extends Model
         }
         if ($api[0] !== 'h') $api = "{$this->api}{$api}";
 
-        $value = Output::request($api, $data, $option);
+        $value = (new Http($option))->data($data)->url($api)->post('json');
 
         $prev = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
         $this->debug(['api' => $api, 'data' => $data, 'value' => $value], $prev);

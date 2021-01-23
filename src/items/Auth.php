@@ -47,7 +47,6 @@ final class Auth extends Base
         $info = $this->Request($api);
         if (is_string($info)) return $info;
 
-//        $info = Output::request("https://api.weixin.qq.com{$api}", $option);
         if (isset($info['openid'])) {
             //重组最后跳回发起页面，交给控制器跳转
             return sprintf(base64_decode($back), $info['openid'], md5("{$app['openWebAppID']}/{$info['openid']}/signCodeOpenID"));

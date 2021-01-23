@@ -4,12 +4,11 @@ namespace esp\weixin;
 
 
 use esp\core\Debug;
-use esp\core\Output;
+use esp\http\Http;
 use esp\library\ext\Xml;
 
 abstract class Base
 {
-    protected $wx;
     protected $conf;
     protected $AppID;
 
@@ -51,21 +50,12 @@ abstract class Base
      */
     protected function tempCache(string $name, $value = null)
     {
-//        $table = $this->Platform ? "PLAT_{$this->Platform->PlatformAppID}" : "APP_{$this->AppID}";
-
         if (is_null($value)) {
             if (!is_readable("{$this->path}/{$name}")) return null;
             $txt = file_get_contents("{$this->path}/{$name}");
             return unserialize($txt);
         }
         return file_put_contents("{$this->path}/{$name}", serialize($value)) > 0;
-
-//
-//        if (is_null($value)) {
-//            return $this->Redis()->hGet($table, "{$name}_{$this->AppID}");
-//        }
-//
-//        return $this->Redis()->hSet($table, "{$name}_{$this->AppID}", $value);
     }
 
 
@@ -124,27 +114,28 @@ abstract class Base
         }
         if ($api[0] !== 'h') $api = "{$this->host}{$api}";
 
-        $value = Output::request($api, $data, $option);
-        $this->debug([$api, $data, $option, $value]);
-        if ($option['encode'] === 'html') return $value;
+        $request = (new Http($option))->data($data)->encode('json')->post($api);
 
+        $this->debug([$api, $data, $option, $request]);
+        if ($option['encode'] === 'html') return $request->html();
+        $error = $request->error();
+        if ($error) return $error;
+        $value = $request->data();
         $check = $this->checkError($value);
         if ($check === 'try_once' and !$hasTry) {
             if (_CLI) echo "{$api}\n";
-
             $hasTry = true;
             goto tryOnce;
         }
+
         if (is_string($check)) {
-//            if (_CLI) echo "{$api}\n";
             if ($check === 'try_once') {
-                $check = "({$value['array']["errcode"]}){$value['array']["errmsg"]}-{$api}";
+                $check = "({$value["errcode"]}){$value["errmsg"]}-{$api}";
             }
             return $check;
         }
 
-        if (!isset($value['array'])) return $value['message'];
-        return $value['array'];
+        return $value;
     }
 
 
@@ -157,15 +148,14 @@ abstract class Base
      * string：具体错误
      * @throws \Exception
      */
-    final protected function checkError($inArr, array $allowCode = [])
+    final protected function checkError(array $inArr, array $allowCode = [])
     {
         if ($inArr["error"]) return $inArr['message'];
-        if (!isset($inArr['array']["errcode"])) return $inArr['array'];
-
-        $errCode = intval($inArr['array']["errcode"]);
+        if (!isset($inArr["errcode"])) return true;
+        $errCode = intval($inArr["errcode"]);
 
         if ($errCode === 0) {
-            return $inArr;
+            return true;
 
         } else if ($errCode === 40125) {
             $returnInfo = 'AppSecret(应用密钥)被修改，请立即重新配置';
@@ -182,7 +172,7 @@ abstract class Base
 
         } else if (in_array($errCode, $allowCode)) {
             //无错，或对于需要返回空值的错误代码
-            return $inArr['array'];
+            return true;
 
         } elseif (in_array($errCode, [41001, 40001, 40014, 42001])) {
             //验证若出错,是否因为Token过期
@@ -192,8 +182,9 @@ abstract class Base
             return 'try_once';
 
         } else {
-            return "({$errCode}){$inArr['array']["errmsg"]}";
+            return "({$errCode}){$inArr["errmsg"]}";
         }
+
     }
 
 
