@@ -5,6 +5,7 @@ namespace esp\weixin;
 
 use esp\core\Debug;
 use esp\http\Http;
+use esp\http\Result;
 use esp\library\ext\Xml;
 
 abstract class Base
@@ -89,7 +90,7 @@ abstract class Base
      * @param null $data
      * @param array $option
      * @param null $cert
-     * @return array|mixed|string
+     * @return array|mixed|string|Result
      * @throws \Exception
      */
     final public function Request(string $url, $data = null, array $option = [], $cert = null)
@@ -117,7 +118,7 @@ abstract class Base
         $request = (new Http($option))->data($data)->post($api);
 
         $this->debug([$api, $data, $option, $request]);
-        if ($option['encode'] === 'html') return $request->html();
+        if ($option['encode'] === 'html') return $request;
         $error = $request->error();
         if ($error) return $error;
         $value = $request->data();

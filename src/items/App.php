@@ -27,7 +27,7 @@ class App extends Base
 //        $option['debug'] = false;
 
         $data = [];
-        $data['page'] = 'init';
+        $data['page'] = 'init';//不能携带参数（参数请放在scene字段里）
         $data['width'] = $width;//280-1280
         $data['scene'] = $scene;
 //        $data['is_hyaline'] = true;
@@ -35,15 +35,16 @@ class App extends Base
         $api = "/wxa/getwxacodeunlimit?access_token={access_token}";
         $rest = $this->Request($api, $data, $option);
         if (is_string($rest)) return $rest;
-        if ($rest['error']) return $rest['message'];
-        if ($rest['html'][0] === '{') {
-            $json = json_decode($rest['html'], true);
-            return $json['errmsg'] ?? $rest['html'];
+        if ($msg = $rest->error()) return $msg;
+        $html = $rest->html();
+        if ($html[0] === '{') {
+            $json = json_decode($html, true);
+            return $json['errmsg'] ?? $html;
         }
 
         mk_dir($fileName);
         $file = fopen($fileName, "w");
-        fwrite($file, $rest['html']);
+        fwrite($file, $html);
         fclose($file);
         return true;
     }
@@ -63,7 +64,7 @@ class App extends Base
     public function getWxACode(string $fileName, array $param, int $width = 430)
     {
         $option = [];
-        $option['encode'] = 'json';
+        $option['encode'] = 'html';
 //        $option['debug'] = false;
 
         $data = [];
@@ -75,16 +76,15 @@ class App extends Base
         $api = "/wxa/getwxacode?access_token={access_token}";
         $rest = $this->Request($api, $data, $option);
         if (is_string($rest)) return $rest;
-        if ($rest['error']) return $rest['message'];
-        if ($rest['html'][0] === '{') {
-            $json = json_decode($rest['html'], true);
-            return $json['errmsg'] ?? $rest['html'];
+        if ($msg = $rest->error()) return $msg;
+        $html = $rest->html();
+        if ($html[0] === '{') {
+            $json = json_decode($html, true);
+            return $json['errmsg'] ?? $html;
         }
-
         mk_dir($fileName);
-
         $file = fopen($fileName, "w");
-        fwrite($file, $rest['html']);
+        fwrite($file, $html);
         fclose($file);
         return true;
     }
@@ -102,7 +102,7 @@ class App extends Base
     public function createQRCode(string $fileName, array $param, int $width = 430)
     {
         $option = [];
-        $option['encode'] = 'json';
+        $option['encode'] = 'html';
 //        $option['debug'] = false;
 
         $data = [];
@@ -114,16 +114,17 @@ class App extends Base
         $api = "/cgi-bin/wxaapp/createwxaqrcode?access_token={access_token}";
         $rest = $this->Request($api, $data, $option);
         if (is_string($rest)) return $rest;
-        if ($rest['error']) return $rest['message'];
-        if ($rest['html'][0] === '{') {
-            $json = json_decode($rest['html'], true);
-            return $json['errmsg'] ?? $rest['html'];
+        if ($msg = $rest->error()) return $msg;
+        $html = $rest->html();
+        if ($html[0] === '{') {
+            $json = json_decode($html, true);
+            return $json['errmsg'] ?? $html;
         }
 
         mk_dir($fileName);
 
         $file = fopen($fileName, "w");
-        fwrite($file, $rest['html']);
+        fwrite($file, $html);
         fclose($file);
         return true;
     }
