@@ -31,6 +31,7 @@ class App extends Base
         $data['width'] = $width;//280-1280
         $data['scene'] = $scene;
 //        $data['is_hyaline'] = true;
+        $data = json_encode($data, 256 | 64);
 
         $api = "/wxa/getwxacodeunlimit?access_token={access_token}";
         $rest = $this->Request($api, $data, $option);
