@@ -117,6 +117,8 @@ abstract class Base
         $request = (new Http($option))->data($data)->post($api);
 
         $this->debug([$api, $data, $option, $request]);
+        if ($err = $request->error()) return $err;
+
         if ($option['encode'] === 'html') return $request->html();
         $error = $request->error();
         if ($error) return $error;
