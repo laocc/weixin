@@ -119,10 +119,11 @@ abstract class Base
         $this->debug([$api, $data, $option, $request]);
         if ($err = $request->error()) return $err;
 
-        if ($option['encode'] === 'html') return $request->html();
-
         $error = $request->error();
         if ($error) return $error;
+
+        if ($option['encode'] === 'html') return $request;
+
         $value = $request->data();
         $check = $this->checkError($value);
         if ($check === 'try_once' and !$hasTry) {

@@ -35,7 +35,7 @@ class App extends Base
 
         $api = "/wxa/getwxacodeunlimit?access_token={access_token}";
         $rest = $this->Request($api, $data, $option);
-//        if (is_string($rest)) return $rest;
+        if (is_string($rest)) return $rest;
         if ($msg = $rest->error()) return $msg;
         $html = $rest->html();
         if ($html[0] === '{') {
