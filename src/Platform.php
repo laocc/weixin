@@ -5,7 +5,6 @@ namespace esp\weixin;
 use esp\core\db\Redis;
 use esp\core\Input;
 use esp\core\Model;
-use esp\core\Output;
 use esp\http\Http;
 use esp\weixin\items\Open;
 use esp\weixin\auth\Crypt;

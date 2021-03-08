@@ -66,6 +66,7 @@ abstract class Base
      */
     public function debug($val, $prev = null)
     {
+        return null;
         $debug = Debug::class();
         if (is_null($debug)) return false;
         if (is_null($val)) return $debug;
