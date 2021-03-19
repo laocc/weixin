@@ -1,10 +1,14 @@
 {
   "name": "laocc/weixin",
   "description": "for weichat mp",
+  "homepage": "https://github.com/laocc/weixin",
+  "authors": [
+    {
+      "name": "fazo",
+      "email": "fazo@qq.com"
+    }
+  ],
   "require": {
-    "php": ">7.0"
-  },
-  "require-dev": {
     "php": ">7.0"
   },
   "autoload": {
