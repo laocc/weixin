@@ -397,8 +397,6 @@ abstract class Base
         $msg = [];
         $msg['success'] = false;
         $msg['error'] = $str;
-//        echo json_encode($msg, 256);
-//        exit();
     }
 
 
