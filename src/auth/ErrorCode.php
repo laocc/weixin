@@ -1,6 +1,6 @@
 <?php
 
-namespace esp\weixin\auth;
+namespace esp\weiXin\auth;
 
 
 /**

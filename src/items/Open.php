@@ -1,9 +1,9 @@
 <?php
 
-namespace esp\weixin\items;
+namespace esp\weiXin\items;
 
 
-use esp\weixin\Platform;
+use esp\weiXin\Platform;
 
 class Open
 {

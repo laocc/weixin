@@ -1,10 +1,10 @@
 <?php
 
-namespace esp\weixin\items;
+namespace esp\weiXin\items;
 
 
-use esp\weixin\Platform;
-use esp\weixin\Base;
+use esp\weiXin\Platform;
+use esp\weiXin\Base;
 
 final class Fans extends Base
 {

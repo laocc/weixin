@@ -1,8 +1,8 @@
 <?php
 
-namespace esp\weixin\items;
+namespace esp\weiXin\items;
 
-use esp\weixin\Base;
+use esp\weiXin\Base;
 
 final class Menu extends Base
 {

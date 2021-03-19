@@ -1,9 +1,9 @@
 <?php
 
-namespace esp\weixin\items;
+namespace esp\weiXin\items;
 
-use esp\weixin\Base;
-use esp\weixin\Send;
+use esp\weiXin\Base;
+use esp\weiXin\Send;
 
 final class Template extends Base implements Send
 {

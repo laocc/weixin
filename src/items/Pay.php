@@ -1,9 +1,9 @@
 <?php
 
-namespace esp\weixin\items;
+namespace esp\weiXin\items;
 
 use function esp\helper\str_rand;
-use esp\weixin\Base;
+use esp\weiXin\Base;
 
 final class Pay extends Base
 {

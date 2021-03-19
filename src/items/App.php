@@ -1,9 +1,9 @@
 <?php
 
-namespace esp\weixin\items;
+namespace esp\weiXin\items;
 
 use function esp\helper\mk_dir;
-use esp\weixin\Base;
+use esp\weiXin\Base;
 
 class App extends Base
 {

@@ -1,19 +1,19 @@
 <?php
 
-namespace esp\weixin;
+namespace esp\weiXin;
 
-use \esp\weixin\items\Api;
-use esp\weixin\items\App;
-use \esp\weixin\items\Auth;
-use \esp\weixin\items\Custom;
-use \esp\weixin\items\Fans;
-use \esp\weixin\items\Push;
-use \esp\weixin\items\Reply;
-use \esp\weixin\items\Media;
-use \esp\weixin\items\Menu;
-use \esp\weixin\items\Tag;
-use \esp\weixin\items\Template;
-use \esp\weixin\items\Pay;
+use \esp\weiXin\items\Api;
+use \esp\weiXin\items\App;
+use \esp\weiXin\items\Auth;
+use \esp\weiXin\items\Custom;
+use \esp\weiXin\items\Fans;
+use \esp\weiXin\items\Push;
+use \esp\weiXin\items\Reply;
+use \esp\weiXin\items\Media;
+use \esp\weiXin\items\Menu;
+use \esp\weiXin\items\Tag;
+use \esp\weiXin\items\Template;
+use \esp\weiXin\items\Pay;
 
 abstract class WeiChat
 {

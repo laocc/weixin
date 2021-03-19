@@ -1,6 +1,6 @@
 <?php
 
-namespace esp\weixin;
+namespace esp\weiXin;
 
 use esp\core\Debug;
 use esp\http\Http;

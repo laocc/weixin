@@ -1,6 +1,6 @@
 <?php
 
-namespace esp\weixin;
+namespace esp\weiXin;
 
 
 final class MiniCrypt

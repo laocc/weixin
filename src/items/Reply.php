@@ -1,9 +1,9 @@
 <?php
 
-namespace esp\weixin\items;
+namespace esp\weiXin\items;
 
 use esp\library\request\Get;
-use esp\weixin\Base;
+use esp\weiXin\Base;
 
 final class Reply extends Base
 {

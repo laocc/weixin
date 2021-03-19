@@ -1,14 +1,13 @@
 <?php
 
-namespace esp\weixin;
+namespace esp\weiXin;
 
 use esp\core\db\Redis;
 use esp\core\Input;
 use esp\core\Model;
-use esp\core\Output;
 use esp\http\Http;
-use esp\weixin\items\Open;
-use esp\weixin\auth\Crypt;
+use esp\weiXin\items\Open;
+use esp\weiXin\auth\Crypt;
 
 final class Platform extends Model
 {
