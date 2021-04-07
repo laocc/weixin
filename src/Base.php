@@ -24,8 +24,9 @@ abstract class Base
 
     protected $Hash;
     protected $redis;
+    protected $debug;
 
-    public function __construct(array $conf)
+    public function __construct(array $conf, Debug $debug = null)
     {
         if (!isset($conf['appid']) or empty($conf['appid'])) {
             throw new \Error("wx conf 至少要含有appid:" . json_encode($conf, 256 | 64));
@@ -34,6 +35,7 @@ abstract class Base
         if (!is_dir($this->path)) mkdir($this->path, 0740, true);
         $this->conf = $conf;
         $this->AppID = $conf['appid'];
+        $this->debug = $debug;
     }
 
 
@@ -66,12 +68,10 @@ abstract class Base
      */
     public function debug($val, $prev = null)
     {
-        return null;
-        $debug = Debug::class();
-        if (is_null($debug)) return false;
-        if (is_null($val)) return $debug;
+        if (is_null($this->debug)) return false;
+        if (is_null($val)) return $this->debug;
         $prev = is_null($prev) ? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0] : $prev;
-        return $debug->relay($val, $prev);
+        return $this->debug->relay($val, $prev);
     }
 
     /**
