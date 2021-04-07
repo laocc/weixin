@@ -52,7 +52,7 @@ final class Custom extends Base implements Send
         $api = "/cgi-bin/message/custom/send?access_token={access_token}";
         $rest = $this->Request($api, $data);
         if (is_string($rest)) return $rest;
-        if (strtolower($rest['errmsg']) === 'ok') return true;
+        if (strtolower($rest['errmsg'] ?? '') === 'ok') return true;
         return $rest['errmsg'] ?? ($rest['menuid'] ?? 'OK');
     }
 
@@ -64,7 +64,7 @@ final class Custom extends Base implements Send
         $api = "/cgi-bin/message/custom/send?access_token={access_token}";
         $rest = $this->Request($api, $data);
         if (is_string($rest)) return $rest;
-        if (strtolower($rest['errmsg']) === 'ok') return true;
+        if (strtolower($rest['errmsg'] ?? '') === 'ok') return true;
         return $rest['errmsg'] ?? ($rest['menuid'] ?? 'OK');
     }
 

@@ -65,7 +65,7 @@ final class Media extends Base
         $api = "/cgi-bin/material/del_material?access_token={access_token}";
         $rest = $this->Request($api, ['media_id' => $mediaID]);
         if (is_string($rest)) return $rest;
-        return $rest['errmsg'] === 'ok';
+        return ($rest['errmsg'] ?? '') === 'ok';
     }
 
 

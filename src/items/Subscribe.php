@@ -28,21 +28,21 @@ class Subscribe extends Base
      */
     public function sendSubscribeMsg(string $openID, string $tempID, array $params, string $page)
     {
-//        $param = [];
+        $param = [];
 //        foreach ($params as $k => $v) $param[$k] = ['value' => $v];
-        foreach ($params as $k => &$v) $v = ['value' => $v];
+        foreach ($params as $k => $v) $param[$k] = ['value' => $v];
 
         $data = [];
         $data['touser'] = $openID;
         $data['template_id'] = $tempID;
-        $data['page'] = $page;
-        $data['data'] = $params;
-//        $data['miniprogram_state'] = 'trial';
         $data['lang'] = 'zh_CN';
+        $data['page'] = $page;
+//        $data['miniprogram_state'] = 'trial';
+        $data['data'] = $param;
         $api = "/cgi-bin/message/subscribe/send?access_token={access_token}";
         $rest = $this->Request($api, $data);
         if (is_string($rest)) return $rest;
-        if (strtolower($rest['errmsg']) === 'ok') return true;
+        if (strtolower($rest['errmsg'] ?? '') === 'ok') return true;
         return $rest['errmsg'] ?? 'ok';
     }
 
@@ -144,7 +144,7 @@ class Subscribe extends Base
         $api = "/cgi-bin/message/wxopen/template/uniform_send?access_token={access_token}";
         $rest = $this->Request($api, $data);
         if (is_string($rest)) return $rest;
-        if (strtolower($rest['errmsg']) === 'ok') return true;
+        if (strtolower($rest['errmsg'] ?? '') === 'ok') return true;
         return $rest['errmsg'] ?? ($rest['menuid'] ?? 'OK');
 
     }

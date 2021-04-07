@@ -42,7 +42,7 @@ final class Template extends Base implements Send
         $api = "/cgi-bin/message/template/send?access_token={access_token}";
         $get = $this->Request($api, $value);
         if (is_string($get)) return $get;
-        if (strtolower($get['errmsg']) === 'ok') return true;
+        if (strtolower($get['errmsg'] ?? '') === 'ok') return true;
         return $get['errmsg'];
     }
 
