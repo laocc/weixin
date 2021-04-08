@@ -11,6 +11,8 @@ final class Crypt
     private $encodingAesKey;
 
     /**
+     * 公众平台、小程序消息解密
+     *
      * WXBizMsgCrypt constructor.
      * Crypt constructor.
      * @param string $appId 公众平台的appId
