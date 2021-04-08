@@ -100,6 +100,7 @@ abstract class Base
         if ($cert and !isset($option['cert'])) $option['cert'] = $cert;
         if (!isset($option['type'])) $option['type'] = 'get';
         if (!isset($option['encode'])) $option['encode'] = 'json';
+        if (is_array($data)) $data = json_encode($data, 256 | 64);
 
         $hasTry = false;
         tryOnce:
