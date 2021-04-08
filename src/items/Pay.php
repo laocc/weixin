@@ -7,15 +7,21 @@ use esp\weiXin\Base;
 
 final class Pay extends Base
 {
+    private $mch;
 
+    public function setMerchant(array $mch)
+    {
+        $this->mch = $mch;
+        return $this;
+    }
 
     public function refundPay(array $payment)
     {
         if ($payment['notify_url'][0] === '/') $payment['notify_url'] = _HTTP_ . "api." . _HOST . $payment['notify_url'];
 
         $payInfo = array();
-        $payInfo['appid'] = $this->conf['appid'];
-        $payInfo['mch_id'] = $this->conf['mchid'];
+        $payInfo['appid'] = $this->mch['appid'];
+        $payInfo['mch_id'] = $this->mch['mchid'];
         $payInfo['nonce_str'] = str_rand(15);
         $payInfo['sign_type'] = 'MD5';
         $payInfo['transaction_id'] = $payment['transaction_id'];
@@ -26,16 +32,16 @@ final class Pay extends Base
         $payInfo['refund_desc'] = $payment['refund_desc'];
         $payInfo['notify_url'] = $payment['notify_url'];
         $payInfo['refund_fee_type'] = 'CNY';
-        $payInfo['sign'] = $this->createSign($payInfo, $this->conf['key']);//签名，详见签名生成算法
+        $payInfo['sign'] = $this->createSign($payInfo, $this->mch['key']);//签名，详见签名生成算法
 
         $payInfoXml = $this->xml($payInfo);
-        $this->debug([$this->conf, $payInfo, $payInfoXml]);
+        $this->debug([$this->mch, $payInfo, $payInfoXml]);
 
         $api = 'https://api.mch.weixin.qq.com/secapi/pay/refund';
         $option = [];
         $option['encode'] = 'xml';
         $option['type'] = 'post';
-        $option['cert'] = $this->conf['cert'];
+        $option['cert'] = $this->mch['cert'];
 //        $option['cert'] = ['cert' => $config['cert.cert'], 'key' => $config['cert.key']];
 
         $content = $this->Request($api, $payInfoXml, $option);
@@ -44,7 +50,7 @@ final class Pay extends Base
         if (!is_array($content)) return "{$err}{$content}";
         if ($content['return_code'] !== 'SUCCESS') return "{$err}{$content['return_msg']}";        //生成支付时错误
         if ($content['result_code'] !== 'SUCCESS') return "{$err}{$content['err_code_des']}";        //生成支付时错误
-        if (!$this->checkSign($content, $this->conf['key'])) return "{$err}返回签名错误";
+        if (!$this->checkSign($content, $this->mch['key'])) return "{$err}返回签名错误";
 
         return $content;
     }
@@ -56,7 +62,7 @@ final class Pay extends Base
      */
     public function deCodeCryptRefund(string $code)
     {
-        return openssl_decrypt(base64_decode($code), "AES-256-ECB", md5($this->conf['key']), OPENSSL_RAW_DATA);
+        return openssl_decrypt(base64_decode($code), "AES-256-ECB", md5($this->mch['key']), OPENSSL_RAW_DATA);
     }
 
 
@@ -94,8 +100,8 @@ final class Pay extends Base
         $return = [];
         $return['return_code'] = 'SUCCESS';
         $return['result_code'] = 'SUCCESS';
-        $return['appid'] = $this->conf['appid'];
-        $return['mch_id'] = $this->conf['mchid'];
+        $return['appid'] = $this->mch['appid'];
+        $return['mch_id'] = $this->mch['mchid'];
         $return['nonce_str'] = str_rand(32);
         $return['prepay_id'] = $unified['prepay_id'];
         return $return;
@@ -125,17 +131,17 @@ final class Pay extends Base
     {
         $unified = $this->UnifiedOrder('JSAPI', $data);//统一下单
         if (is_string($unified)) {
-            $this->debug(['JSAPI.统一下单异常：', $data, $this->conf])->error($unified);
+            $this->debug(['JSAPI.统一下单异常：', $data, $this->mch])->error($unified);
             return $unified;
         }
 
         $values = array();
-        $values['appId'] = $this->conf['appid'];
+        $values['appId'] = $this->mch['appid'];
         $values['timeStamp'] = strval($data['time']);//这timeStamp中间的S必须是大写
         $values['nonceStr'] = str_rand(30);//随机字符串，不长于32位。推荐随机数生成算法
         $values['package'] = "prepay_id={$unified['prepay_id']}";
         $values['signType'] = 'MD5';
-        $values['paySign'] = $this->createSign($values, $this->conf['token']);//生成签名
+        $values['paySign'] = $this->createSign($values, $this->mch['token']);//生成签名
         return $values;
     }
 
@@ -143,13 +149,13 @@ final class Pay extends Base
     {
         $unified = $this->UnifiedOrder('MWEB', $data);//统一下单
         if (is_string($unified)) {
-            $this->debug(['MWEB.统一下单异常：', $data, $this->conf])->error($unified);
+            $this->debug(['MWEB.统一下单异常：', $data, $this->mch])->error($unified);
             return $unified;
         }
 
         $values = array();
-        $values['appid'] = $this->conf['appid'];
-        $values['partnerid'] = $this->conf['mchid'];//商户号
+        $values['appid'] = $this->mch['appid'];
+        $values['partnerid'] = $this->mch['mchid'];//商户号
         $values['prepayid'] = $unified['prepay_id'];
         $values['mweb_url'] = $unified['mweb_url'];
         return $values;
@@ -165,18 +171,18 @@ final class Pay extends Base
     {
         $unified = $this->UnifiedOrder('APP', $data);//统一下单
         if (is_string($unified)) {
-            $this->debug(['APP.统一下单异常：', $data, $this->conf])->error($unified);
+            $this->debug(['APP.统一下单异常：', $data, $this->mch])->error($unified);
             return $unified;
         }
 
         $rest = [];
-        $rest['appid'] = $this->conf['appid'];
-        $rest['partnerid'] = $this->conf['mchid'];//商户号
+        $rest['appid'] = $this->mch['appid'];
+        $rest['partnerid'] = $this->mch['mchid'];//商户号
         $rest['prepayid'] = $unified['prepay_id'];//微信返回的支付交易会话ID
         $rest['package'] = 'Sign=WXPay';
         $rest['noncestr'] = str_rand(30);//随机数
         $rest['timestamp'] = $data['time'];
-        $rest['sign'] = $this->createSign($rest, $this->conf['token']);
+        $rest['sign'] = $this->createSign($rest, $this->mch['token']);
         return $rest;
     }
 
@@ -195,7 +201,7 @@ final class Pay extends Base
     private function UnifiedOrder(string $type, array $data)
     {
         $type = strtoupper($type);
-        $config = $this->conf;
+        $config = $this->mch;
         $this->debug([$type, $config]);
 
         $data += [
@@ -266,8 +272,8 @@ final class Pay extends Base
     {
         $api = 'https://api.mch.weixin.qq.com/pay/orderquery';
         $data = [];
-        $data['appid'] = $this->conf['appid'];
-        $data['mch_id'] = $this->conf['mchid'];
+        $data['appid'] = $this->mch['appid'];
+        $data['mch_id'] = $this->mch['mchid'];
         if ($ordTansID) {
             $data['transaction_id'] = $ordTansID;
         } else {
@@ -275,7 +281,7 @@ final class Pay extends Base
         }
         $data['nonce_str'] = str_rand(20);
 //        $data['sign_type'] = 'MD5';
-        $data['sign'] = $this->createSign($data, $this->conf['token']);//签名，详见签名生成算法
+        $data['sign'] = $this->createSign($data, $this->mch['token']);//签名，详见签名生成算法
         $data = $this->xml($data);
 
         $option = [];
@@ -286,7 +292,7 @@ final class Pay extends Base
         if (!is_array($content)) return 'Q:订单查询-' . $content;
         if ($content['return_code'] !== 'SUCCESS') return 'Q:订单查询-' . $content['return_msg'];        //生成支付时错误
         if ($content['result_code'] !== 'SUCCESS') return 'Q:订单查询-' . $content['err_code_des'];        //生成支付时错误
-        if (!$this->checkSign($content, $this->conf['token'])) return 'Q:订单查询-返回签名错误';
+        if (!$this->checkSign($content, $this->mch['token'])) return 'Q:订单查询-返回签名错误';
 
         $this->debug($content);
 

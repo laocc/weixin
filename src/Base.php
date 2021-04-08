@@ -28,9 +28,13 @@ abstract class Base
 
     public function __construct(array $conf, Debug $debug = null)
     {
-        if (!isset($conf['appid']) or empty($conf['appid'])) {
+        if (empty($conf['appid'] ?? '')) $conf['appid'] = $conf['mppAppID'] ?? '';
+        if (empty($conf['secret'] ?? '')) $conf['secret'] = $conf['mppSecret'] ?? '';
+
+        if (empty($conf['appid'])) {
             throw new \Error("wx conf 至少要含有appid:" . json_encode($conf, 256 | 64));
         }
+
         $this->path = "/tmp/wx/{$conf['appid']}";
         if (!is_dir($this->path)) mkdir($this->path, 0740, true);
         $this->conf = $conf;
@@ -367,6 +371,11 @@ abstract class Base
     {
         $this->mpp = $mpp;
         $this->AppID = $mpp['mppAppID'];
+        $this->conf = ['appid' => $mpp['mppAppID'], 'secret' => $mpp['mppSecret']];
+
+        $this->path = "/tmp/wx/{$this->AppID}";
+        if (!is_dir($this->path)) mkdir($this->path, 0740, true);
+
         return $this;
     }
 

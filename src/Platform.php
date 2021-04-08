@@ -79,10 +79,11 @@ final class Platform extends Model
      * 2，后台通知到/mpp/openPost，即本类->acceptGrantEvent
      *
      * @param $adminID
+     * @param $type
      * @return array|string
      * @throws \Exception
      */
-    public function CreateAccessGrantCode(int $adminID)
+    public function CreateAccessGrantCode(int $adminID, int $type = 1)
     {
         $data = ['component_appid' => $this->PlatformAppID];
         $api = '/cgi-bin/component/api_create_preauthcode?component_access_token={component_access_token}';
@@ -93,8 +94,8 @@ final class Platform extends Model
         $this->Temp->set(md5($value['pre_auth_code']), $code);
 
         $back = urlencode(sprintf("%s/mpp/access/%s/%s/", $this->PlatformURL, $this->PlatformAppID, $adminID));
-        $url = "https://mp.weixin.qq.com/safe/bindcomponent?action=bindcomponent&auth_type=1&no_scan=1&component_appid=%s&pre_auth_code=%s&redirect_uri=%s#wechat_redirect";
-        return sprintf($url, $this->PlatformAppID, $value['pre_auth_code'], $back);
+        $url = "https://mp.weixin.qq.com/safe/bindcomponent?action=bindcomponent&auth_type=%s&no_scan=1&component_appid=%s&pre_auth_code=%s&redirect_uri=%s#wechat_redirect";
+        return sprintf($url, $type, $this->PlatformAppID, $value['pre_auth_code'], $back);
     }
 
     /**

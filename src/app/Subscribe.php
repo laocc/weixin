@@ -1,6 +1,6 @@
 <?php
 
-namespace esp\weiXin\items;
+namespace esp\weiXin\app;
 
 use esp\weiXin\Base;
 

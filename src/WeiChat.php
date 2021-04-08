@@ -33,47 +33,47 @@ abstract class WeiChat
         return new Reply($conf);
     }
 
-    public function Custom(array $conf)
+    public static function Custom(array $conf)
     {
         return new Custom($conf);
     }
 
-    public function Push(array $conf)
+    public static function Push(array $conf)
     {
         return new Push($conf);
     }
 
-    public function Media(array $conf)
+    public static function Media(array $conf)
     {
         return new Media($conf);
     }
 
-    public function Fans(array $conf)
+    public static function Fans(array $conf)
     {
         return new Fans($conf);
     }
 
-    public function Menu(array $conf)
+    public static function Menu(array $conf)
     {
         return new Menu($conf);
     }
 
-    public function Tag(array $conf)
+    public static function Tag(array $conf)
     {
         return new Tag($conf);
     }
 
-    public function Api(array $conf)
+    public static function Api(array $conf)
     {
         return new Api($conf);
     }
 
-    public function Auth(array $conf)
+    public static function Auth(array $conf)
     {
         return new Auth($conf);
     }
 
-    public function Template(array $conf)
+    public static function Template(array $conf)
     {
         return new Template($conf);
     }
