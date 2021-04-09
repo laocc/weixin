@@ -109,18 +109,19 @@ final class Custom extends Base implements Send
 
     public function Ask(array $option)
     {
+        $ask = $option['ask'];
         $cond = [];
-        foreach ($option['content'] as $i => $cont) {
+        foreach ($ask['content'] as $i => $cont) {
             $cond[] = [
-                'id' => $option['ask']['id'] . substr("0{$i}", -2),
+                'id' => $ask['id'] . substr("0{$i}", -2),
                 'content' => '(' . ($i + 1) . ') ' . $cont['title']
             ];
         }
 
         $reply = [];
         $reply['msgmenu'] = [
-            'head_content' => $option['head'],
-            'tail_content' => $option['tail'],
+            'head_content' => $ask['head'],
+            'tail_content' => $ask['tail'],
             'list' => $cond,
         ];
         return $reply;
