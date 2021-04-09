@@ -30,9 +30,9 @@ final class Template extends Base implements Send
         $value['touser'] = $this->openID;
         $value['template_id'] = $content['template']['key'];
         $value['url'] = $content['link'];
-        $value['miniprogram']['appid'] = $content['miniprogram']['appid'];
-        $value['miniprogram']['pagepath'] = $content['miniprogram']['path'];
-        $value['miniprogram']['pagepath'] = $content['miniprogram']['path'];
+        $value['miniprogram']['appid'] = $content['app']['appid'];
+        $value['miniprogram']['pagepath'] = $content['app']['path'];
+        $value['miniprogram']['pagepath'] = $content['app']['path'];
 
         $value['data'] = [];
         foreach ($content['template']['params'] as $k => $v) {
