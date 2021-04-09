@@ -590,7 +590,7 @@ final class Platform extends Model
         }
         if ($api[0] !== 'h') $api = "{$this->api}{$api}";
 
-        $postVal = (new Http($option))->data($data)->url($api)->post('json');
+        $postVal = (new Http($option))->data($data)->post($api);
         $this->debug($postVal);
 
         $value = $postVal->data();
@@ -621,7 +621,7 @@ final class Platform extends Model
     private function checkError($inArr, array $allowCode = [])
     {
         if ($inArr["error"] ?? '') return $inArr['message'] ?? $inArr["error"];
-        if (!isset($inArr['array']["errcode"])) return $inArr['array'];
+        if (!isset($inArr['array']["errcode"])) return $inArr['array'] ?? [];
 
         $errCode = intval($inArr['array']["errcode"] ?? 0);
 
