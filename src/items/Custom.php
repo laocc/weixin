@@ -109,20 +109,18 @@ final class Custom extends Base implements Send
 
     public function Ask(array $option)
     {
-        $askID = intval($option['ask']['id']);
-        $modAsc = new AskModel();
-        $ask = $modAsc->get($askID);
-        $ask['askContent'] = json_decode($ask['askContent'], true);
-
         $cond = [];
-        foreach ($ask['askContent'] as $i => $cont) {
-            $cond[] = ['id' => $askID . substr("0{$i}", -2), 'content' => '(' . ($i + 1) . ') ' . $cont['title']];
+        foreach ($option['content'] as $i => $cont) {
+            $cond[] = [
+                'id' => $option['ask']['id'] . substr("0{$i}", -2),
+                'content' => '(' . ($i + 1) . ') ' . $cont['title']
+            ];
         }
 
         $reply = [];
         $reply['msgmenu'] = [
-            'head_content' => $ask['askTitle'],
-            'tail_content' => $ask['askFoot'],
+            'head_content' => $option['head'],
+            'tail_content' => $option['tail'],
             'list' => $cond,
         ];
         return $reply;
