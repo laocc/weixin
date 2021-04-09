@@ -606,8 +606,7 @@ final class Platform extends Model
         }
         if (is_string($check)) return $check;
 
-        if (!isset($value['array'])) return $value['message'];
-        return $value['array'] ?? [];
+        return $value;
     }
 
 
@@ -622,19 +621,19 @@ final class Platform extends Model
     private function checkError($inArr, array $allowCode = [])
     {
         if ($inArr["error"] ?? '') return $inArr['message'] ?? $inArr["error"];
-        if (!isset($inArr['array']["errcode"])) return $inArr['array'] ?? [];
+        if (!isset($inArr["errcode"])) return $inArr;
 
-        $errCode = intval($inArr['array']["errcode"] ?? 0);
+        $errCode = intval($inArr["errcode"] ?? 0);
 
         if ($errCode === 0) {
             return $inArr;
 
         } else if (in_array($errCode, $allowCode)) {
             //无错，或对于需要返回空值的错误代码
-            return $inArr['array'];
+            return $inArr;
 
         } else {
-            return "({$errCode}){$inArr['array']["errmsg"]}";
+            return "({$errCode})" . ($inArr["errmsg"] ?? '');
         }
     }
 
