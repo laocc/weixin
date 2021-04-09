@@ -192,8 +192,8 @@ final class Platform extends Model
         $value = $this->Request($api, $data);
         if (is_string($value)) return $value;
 
-        if (isset($value['array']['errcode']) and $value['array']['errcode'] > 0) {
-            return $value['array']['errmsg'];
+        if (isset($value['errcode']) and $value['errcode'] > 0) {
+            return $value['errmsg'];
         }
         if (!isset($value['authorization_info'])) return 'empty authorization_info';
 
@@ -238,8 +238,8 @@ final class Platform extends Model
         $this->debug($value);
         if (is_string($value)) return $value;
 
-        if (isset($value['array']['errcode']) and $value['array']['errcode'] > 0) {
-            return $value['array']['errmsg'];
+        if (isset($value['errcode']) and $value['errcode'] > 0) {
+            return $value['errmsg'];
         }
 
         $auth = [];
