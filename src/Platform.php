@@ -606,7 +606,7 @@ final class Platform extends Model
         if (is_string($check)) return $check;
 
         if (!isset($value['array'])) return $value['message'];
-        return $value['array'];
+        return $value['array'] ?? [];
     }
 
 
@@ -620,10 +620,10 @@ final class Platform extends Model
      */
     private function checkError($inArr, array $allowCode = [])
     {
-        if ($inArr["error"]) return $inArr['message'];
+        if ($inArr["error"] ?? '') return $inArr['message'] ?? $inArr["error"];
         if (!isset($inArr['array']["errcode"])) return $inArr['array'];
 
-        $errCode = intval($inArr['array']["errcode"]);
+        $errCode = intval($inArr['array']["errcode"] ?? 0);
 
         if ($errCode === 0) {
             return $inArr;
