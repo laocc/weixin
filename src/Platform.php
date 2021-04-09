@@ -5,6 +5,7 @@ namespace esp\weiXin;
 use esp\core\db\Redis;
 use esp\core\Input;
 use esp\core\Model;
+use function esp\helper\xml_decode;
 use esp\http\Http;
 use esp\weiXin\items\Open;
 use esp\weiXin\auth\Crypt;
@@ -451,8 +452,8 @@ final class Platform extends Model
         $nonce = Input::get('nonce');
 
         $crypt = new Crypt($this->PlatformAppID, $this->PlatformToken, $this->PlatformEncodingAESKey);
-        $input = $crypt->decode($input, $sign, $time, $nonce);
-        $data = xml_decode($input, true);
+        $data = $crypt->decode($input, $sign, $time, $nonce);
+//        $data = xml_decode($input, true);
 
         if (!is_null($debug)) {
             $this->debug($data);
