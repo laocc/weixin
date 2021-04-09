@@ -325,7 +325,6 @@ abstract class Base
     public function reVariable($value)
     {
         if (empty($value)) return $value;
-        if (!is_string($value)) return $value;
         $reJson = false;
         if (is_array($value)) {
             $value = json_encode($value, 256 | 65);
