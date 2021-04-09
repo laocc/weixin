@@ -590,7 +590,10 @@ final class Platform extends Model
         }
         if ($api[0] !== 'h') $api = "{$this->api}{$api}";
 
-        $value = (new Http($option))->data($data)->url($api)->post('json');
+        $postVal = (new Http($option))->data($data)->url($api)->post('json');
+        $this->debug($postVal);
+
+        $value = $postVal->data();
 
         $prev = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
         $this->debug(['api' => $api, 'data' => $data, 'value' => $value], $prev);
