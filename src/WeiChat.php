@@ -2,8 +2,8 @@
 
 namespace esp\weiXin;
 
+use \esp\weiXin\app\App;
 use \esp\weiXin\items\Api;
-use \esp\weiXin\items\App;
 use \esp\weiXin\items\Auth;
 use \esp\weiXin\items\Custom;
 use \esp\weiXin\items\Fans;

@@ -1,22 +1,24 @@
 <?php
 
-namespace esp\weiXin;
+namespace esp\weiXin\app;
 
 
-final class MiniCrypt
+final class Crypt
 {
     private $appid;
     private $sessionKey;
 
     /**
+     * 解密小程序中用户授权时的信息等
+     *
      * 构造函数
-     * @param $sessionKey string 用户在小程序登录后获取的会话密钥
      * @param $appid string 小程序的appid
+     * @param $sessionKey string 用户在小程序登录后获取的会话密钥
      */
     public function __construct($appid, $sessionKey)
     {
-        $this->sessionKey = $sessionKey;
         $this->appid = $appid;
+        $this->sessionKey = $sessionKey;
     }
 
     /**
@@ -34,9 +36,8 @@ final class MiniCrypt
         }
         $aesKey = base64_decode($this->sessionKey);
 
-        if (strlen($iv) != 24) {
-            return 'iv 非法';
-        }
+        if (strlen($iv) != 24) return 'iv 非法';
+
         $aesIV = base64_decode($iv);
 
         $aesCipher = base64_decode($encryptedData);
