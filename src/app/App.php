@@ -1,6 +1,6 @@
 <?php
 
-namespace esp\weiXin\items;
+namespace esp\weiXin\app;
 
 use function esp\helper\mk_dir;
 use esp\weiXin\Base;
