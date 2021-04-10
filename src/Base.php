@@ -40,6 +40,10 @@ abstract class Base
         $this->conf = $conf;
         $this->AppID = $conf['appid'];
         $this->debug = $debug;
+
+        if (isset($conf['platform'])) $this->Platform = $conf['platform'];
+        unset($conf['platform']);
+        if (isset($conf['mppAppID'])) $this->mpp = $conf;
     }
 
 
