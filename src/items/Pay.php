@@ -324,11 +324,13 @@ final class Pay extends Base
     }
 
     //生成签名
-    public function createSign($arrValue, $key)
+    public function createSign(array $arrValue, string $key, string $type = 'md5')
     {
         ksort($arrValue);
         $string = $this->ToUrlParams($arrValue);
-        return strtoupper(md5("{$string}&key={$key}"));
+        if ($type === 'md5') return strtoupper(md5("{$string}&key={$key}"));
+        if ($type === 'sha256') return strtoupper(hash_hmac("sha256", $string, $key));
+        return $string;
     }
 
     private function ToUrlParams($arrValue)
