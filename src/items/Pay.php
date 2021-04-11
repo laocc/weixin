@@ -7,7 +7,7 @@ use esp\weiXin\Base;
 
 final class Pay extends Base
 {
-    private $mch;
+    public $mch;
 
     public function setMerchant(array $mch)
     {
