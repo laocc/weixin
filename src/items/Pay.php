@@ -329,7 +329,7 @@ final class Pay extends Base
         ksort($arrValue);
         $string = $this->ToUrlParams($arrValue);
         if ($type === 'md5') return strtoupper(md5("{$string}&key={$key}"));
-        if ($type === 'sha256') return strtoupper(hash_hmac("sha256", $string, $key));
+        if ($type === 'sha256') return strtoupper(hash_hmac("sha256", "{$string}&key={$key}", $key));
         return $string;
     }
 
