@@ -30,6 +30,21 @@ final class Custom extends Base implements Send
     }
 
 
+    /**
+     * @param array $content
+     * @param array $option
+     * @return bool|mixed|string
+     * @throws \Exception
+     *
+     * 公众号可以发所有消息，
+     *
+     * 小程序里的客服只可以发送：
+     * text    文本消息
+     * image    图片消息
+     * link    图文链接
+     * miniprogrampage    小程序卡片
+     *
+     */
     public function send(array $content, array $option = [])
     {
         if ($content['type'] === 'arts') return "多图文消息暂不支持预览";
@@ -49,20 +64,20 @@ final class Custom extends Base implements Send
             $data['customservice'] = ['kf_account' => $this->custom];
         }
 
-        $api = "/cgi-bin/message/custom/send?access_token={access_token}";
-        $rest = $this->Request($api, $data);
-        if (is_string($rest)) return $rest;
-        if (strtolower($rest['errmsg'] ?? '') === 'ok') return true;
-        return $rest['errmsg'] ?? ($rest['menuid'] ?? 'OK');
+        return $this->post($data, $option);
     }
 
     /**
      * 直接发送在其他地方已组织好的内容
+     * @param array $data
+     * @param array $option
+     * @return bool|mixed|string
+     * @throws \Exception
      */
-    public function post($data)
+    public function post(array $data, array $option = [])
     {
         $api = "/cgi-bin/message/custom/send?access_token={access_token}";
-        $rest = $this->Request($api, $data);
+        $rest = $this->Request($api, $data, $option);
         if (is_string($rest)) return $rest;
         if (strtolower($rest['errmsg'] ?? '') === 'ok') return true;
         return $rest['errmsg'] ?? ($rest['menuid'] ?? 'OK');
@@ -71,45 +86,45 @@ final class Custom extends Base implements Send
 
     /**
      * 文本回复
-     * @param array $option
+     * @param array $content
      * @return array
      */
-    public function Text(array $option)
+    public function Text(array $content)
     {
         $reply = [];
         $reply['text'] = [];
 
-        $opt = [];
-        $opt['href'] = "";
-        $opt['appid'] = "";
-        $opt['path'] = "";
-        $opt['text'] = $option['text']['desc'];
+        $v = [];
+        $v['href'] = "";
+        $v['appid'] = "";
+        $v['path'] = "";
+        $v['text'] = $content['text']['desc'] ?? ($content['text'] ?? '');
 
-        if (!empty($option['link'])) {
-            $opt['href'] = " href='{$option['link']}'";
+        if (!empty($content['link'])) {
+            $v['href'] = " href='{$content['link']}'";
         }
-        if (!empty($option['app']['appid'])) {
-            $opt['appid'] = " data-miniprogram-appid='{$option['app']['appid']}'";
-            $opt['path'] = " data-miniprogram-path='{$option['app']['path']}'";
+        if (!empty($content['app']['appid'])) {
+            $v['appid'] = " data-miniprogram-appid='{$content['app']['appid']}'";
+            $v['path'] = " data-miniprogram-path='{$content['app']['path']}'";
         }
-        if (!empty($option['link']) or !empty($option['app']['appid'])) {
-            $reply['text']['content'] = \esp\helper\replace_array('<a{href}{appid}{path}>{text}</a>', $opt);
+        if (!empty($content['link']) or !empty($content['app']['appid'])) {
+            $reply['text']['content'] = sprintf('%s%s%s%s>%s<%s', '<a', $v['href'], $v['appid'], $v['path'], $v['text'], '/a>');
         } else {
-            $reply['text']['content'] = $option['text']['desc'];
+            $reply['text']['content'] = $content['text']['desc'];
         }
         return $reply;
     }
 
-    public function Image(array $option)
+    public function Image(array $content)
     {
         $reply = [];
-        $reply['image'] = ['media_id' => $option['image']['id']];
+        $reply['image'] = ['media_id' => $content['image']['id'] ?? ($content['image'] ?? '')];
         return $reply;
     }
 
-    public function Ask(array $option)
+    public function Ask(array $content)
     {
-        $ask = $option['ask'];
+        $ask = $content['ask'];
         $cond = [];
         foreach ($ask['content'] as $i => $cont) {
             $cond[] = [
@@ -128,34 +143,34 @@ final class Custom extends Base implements Send
     }
 
 
-    public function App(array $option)
+    public function App(array $content)
     {
         $reply = [];
         $reply['miniprogrampage'] = [
-            'title' => $option['text']['title'],
-            'appid' => $option['app']['appid'],
-            'path' => $option['app']['path'],
-            'thumb_media_id' => $option['image']['id'],
+            'title' => $content['text']['title'],
+            'appid' => $content['app']['appid'],
+            'path' => $content['app']['path'],
+            'thumb_media_id' => $content['image']['id'],
         ];
         return $reply;
     }
 
 
-    public function Voice(array $option)
+    public function Voice(array $content)
     {
         $reply = [];
-        $reply['voice'] = ['media_id' => $option['voice']['id']];
+        $reply['voice'] = ['media_id' => $content['voice']['id']];
         return $reply;
     }
 
-    public function Video(array $option)
+    public function Video(array $content)
     {
         $reply = [];
         $reply['video'] = [
-            'media_id' => $option['video']['id'],
-            'thumb_media_id' => $option['image']['id'],
-            'title' => $option['text']['title'],
-            'description' => $option['text']['desc'],
+            'media_id' => $content['video']['id'],
+            'thumb_media_id' => $content['image']['id'],
+            'title' => $content['text']['title'],
+            'description' => $content['text']['desc'],
         ];
         return $reply;
     }
@@ -187,20 +202,20 @@ final class Custom extends Base implements Send
         return $reply;
     }
 
-    public function News(array $option)
+    public function News(array $content)
     {
         $reply = [];
-        $reply['mpnews']['media_id'] = $option['news']['id'];
+        $reply['mpnews']['media_id'] = $content['news']['id'];
         return $reply;
     }
 
-    public function Menu(array $option)
+    public function Menu(array $content)
     {
         $reply = [];
         $reply['msgmenu'] = [];
-        $reply['msgmenu']['head_content'] = $option['menu']['head'];
-        $reply['msgmenu']['tail_content'] = $option['menu']['tail'];
-        $reply['msgmenu']['list'] = $option['menu']['list'];
+        $reply['msgmenu']['head_content'] = $content['menu']['head'];
+        $reply['msgmenu']['tail_content'] = $content['menu']['tail'];
+        $reply['msgmenu']['list'] = $content['menu']['list'];
         return $reply;
     }
 
