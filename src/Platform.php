@@ -9,7 +9,6 @@ use esp\http\Http;
 use esp\weiXin\items\Open;
 use esp\weiXin\auth\Crypt;
 use function esp\helper\xml_decode;
-use models\MppModel;
 
 final class Platform extends Model
 {
@@ -18,6 +17,7 @@ final class Platform extends Model
 
     private $api = 'https://api.weixin.qq.com';
     public $AppID;
+    public $AppAdminID;
 
     public $PlatformAppID;
     public $PlatformToken;
@@ -52,7 +52,7 @@ final class Platform extends Model
     }
 
 
-    private function token(string $name, $value = null)
+    public function token(string $name, $value = null)
     {
         if (is_null($value)) {
             $val = $this->Hash->get("{$name}_{$this->AppID}");
@@ -182,7 +182,7 @@ final class Platform extends Model
      * @return array|bool|mixed|string
      * @throws \Exception
      */
-    private function getAuthInfo(string $AuthorizationCode, int $adminID)
+    public function getAuthInfo(string $AuthorizationCode)
     {
         $data = [];
         $data['component_appid'] = $this->PlatformAppID;
@@ -218,17 +218,13 @@ final class Platform extends Model
         $minAuth = [1, 2, 3, 4, 7, 11, 15];
         $result = array_intersect($minAuth, $func);
         if ($result !== $minAuth) $auth['warn'] = '授权不完整';
-
-        $modMpp = new MppModel();
-        $update = ['mppOpenAuth' => json_encode($auth, 256)];
-        $modMpp->update(['mppAppID' => $this->AppID], $update);
-        return true;
+        return $auth;
     }
 
     /**
      * 6、获取授权方的帐号基本信息
      */
-    public function getAppInfo(int $adminID)
+    public function getAppInfo()
     {
         $api = "/cgi-bin/component/api_get_authorizer_info?component_access_token={component_access_token}";
         $data = [];
@@ -247,6 +243,7 @@ final class Platform extends Model
         $getApi = true;
         $appInfo = $value['authorizer_info'];
         $authInfo = $value['authorization_info'];
+        $isMiniApp = isset($appInfo['MiniProgramInfo']);
 
         if (isset($authInfo['authorizer_refresh_token'])) {
             if (empty($authInfo['authorizer_refresh_token'])) {
@@ -268,16 +265,24 @@ final class Platform extends Model
         //[1,15,4,7,2,11,6,9,10]}
         $minAuth = [1, 2, 3, 4, 7, 11, 15];
         $result = array_intersect($minAuth, $func);
-        if ($result !== $minAuth) $auth['warn'][] = '授权不完整';
+        if (!$isMiniApp and $result !== $minAuth) $auth['warn'][] = '授权不完整';
 
         $update = [];
         $update['mppOpenAuth'] = json_encode($auth, 256);
         $update['mpQrCode'] = $appInfo['qrcode_url'];
 
-        $update['mppType'] = intval($appInfo['service_type_info']['id']);
-        if ($update['mppType'] === 2) $update['mppType'] = 4;//服务号，未认证
-        if ($update['mppType'] === 0) $update['mppType'] = 1;//订阅号，未认证
-        if (intval($appInfo['verify_type_info']['id']) === 0) $update['mppType'] *= 2;
+        if ($isMiniApp) {
+            $update['mppType'] = intval($appInfo['service_type_info']['id']);
+            if ($update['mppType'] === 0) $update['mppType'] = 16;//普通小程序
+            else if ($update['mppType'] === 12) $update['mppType'] = 64;//试用小程序
+            if (intval($appInfo['verify_type_info']['id']) === 0) $update['mppType'] *= 2;
+
+        } else {
+            $update['mppType'] = intval($appInfo['service_type_info']['id']);
+            if ($update['mppType'] === 0) $update['mppType'] = 1;//订阅号，未认证
+            else if ($update['mppType'] === 2) $update['mppType'] = 4;//服务号，未认证
+            if (intval($appInfo['verify_type_info']['id']) === 0) $update['mppType'] *= 2;
+        }
 
         $update['mppAppID'] = $authInfo['authorizer_appid'];
         $update['mppRealID'] = $appInfo['user_name'];
@@ -286,19 +291,7 @@ final class Platform extends Model
         $update['mppUserName'] = $appInfo['alias'];
         $update['mppOpenKey'] = $this->PlatformAppID;
 
-        $modMpp = new MppModel();
-        $mpp = $modMpp->get(['mppAppID' => $update['mppAppID']]);
-        if (empty($mpp)) {
-            $mpp = $update + $modMpp->newData();
-            $mpp['mppAdminID'] = $adminID;
-            $mpp['mppState'] = 100;
-            return $modMpp->insert([$mpp], true);
-        } else {
-            //未接入改为已接入
-            if ($mpp['mppState'] === 50) $update['mppState'] = 100;
-            return $modMpp->update(['mppID' => $mpp['mppID']], $update);
-        }
-
+        return $update;
         /**
          * 读取并转换站点的基础二维码
          * $appInfo['qrcode_url']
@@ -478,38 +471,25 @@ final class Platform extends Model
                 $code = $this->Temp->get(md5($data['PreAuthCode']));
                 if (empty($code)) break;
 
-                $adminID = intval($code['adminID'] ?? 0);
+                $this->AppAdminID = intval($code['adminID'] ?? 0);
 
                 $this->token("AuthorizationCode", [
                     'code' => $data['AuthorizationCode'],
                     'expires' => intval($data['AuthorizationCodeExpiredTime']) - 100
                 ]);
 
-                $uInfo = $this->getAppInfo($adminID);
-                if (is_string($uInfo)) {
-                    $this->debug('_DEBUG_')->error($uInfo);
-                    return $uInfo;
-                }
-
-                $val = $this->getAuthInfo($data['AuthorizationCode'], $adminID);
-                if (is_string($val)) $this->debug('_DEBUG_')->error($val);
-
-                //首次授权，同步此应用所有信息
                 if ($data['InfoType'] === 'authorized') {
-//                    $this->queue('asyncMpp', ['mppAppID' => $this->AppID]);
                     $this->_buffer->publish('order', 'asyncMpp', ['_action' => 'asyncMpp', 'mppAppID' => $this->AppID]);
                 }
 
                 break;
             case 'unauthorized'://取消授权通知
                 $this->AppID = $data['AuthorizerAppid'];
-                $modMpp = new MppModel();
-                $modMpp->update(['mppAppID' => $this->AppID], ['mppOpenKey	' => '', 'mppOpenAuth' => '']);
                 break;
             default:
         }
 
-        return 'success';
+        return $data['InfoType'];
     }
 
     final protected function task(string $action, $value)
