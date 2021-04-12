@@ -7,16 +7,6 @@ use esp\weiXin\Send;
 
 final class Custom extends Base implements Send
 {
-    private $openID;
-    private $custom;
-
-    public function setFans(string $openID, string $nick)
-    {
-        $this->openID = $openID;
-        $this->setNick($nick);
-        return $this;
-    }
-
 
     /**
      * 指定客服

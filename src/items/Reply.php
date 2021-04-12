@@ -202,7 +202,7 @@ final class Reply extends Base
     private function _Reply_Template($type = 'text')
     {
         $xml = array();
-        $xml['ToUserName'] = $this->OpenID;
+        $xml['ToUserName'] = $this->openID;
         $xml['FromUserName'] = $this->mpp['mppRealID'];//系统微信号
         $xml['CreateTime'] = time();
         $xml['MsgType'] = $type;

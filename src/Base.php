@@ -17,8 +17,8 @@ abstract class Base
     public $host = 'https://api.weixin.qq.com';
 
     public $mpp;
-    public $OpenID;
-    public $Nick;
+    public $openID;
+    public $nick;
 
     public $Platform;
 
@@ -286,8 +286,8 @@ abstract class Base
         $key['AppID'] = $this->AppID;
         $key['AppName'] = $this->mpp['mppName'];
         $key['RealID'] = $this->mpp['mppRealID'];
-        $key['OpenID'] = $this->OpenID;
-        $key['Nick'] = $this->Nick;
+        $key['OpenID'] = $this->openID;
+        $key['Nick'] = $this->nick;
 
         $setup = $this->mpp['mppSetup'];
         if (is_string($setup)) $setup = json_decode($setup, true) ?: [];
@@ -339,15 +339,23 @@ abstract class Base
         return $this;
     }
 
-    public function setOpenID($OpenID)
+
+    public function setFans(string $openID, string $nick)
     {
-        $this->OpenID = $OpenID;
+        $this->openID = $openID;
+        $this->nick = $nick;
         return $this;
     }
 
-    public function setNick($nick)
+    public function setOpenID(string $OpenID)
     {
-        $this->Nick = $nick;
+        $this->openID = $OpenID;
+        return $this;
+    }
+
+    public function setNick(string $nick)
+    {
+        $this->nick = $nick;
         return $this;
     }
 
@@ -357,6 +365,7 @@ abstract class Base
         $msg = [];
         $msg['success'] = false;
         $msg['error'] = $str;
+        return $this;
     }
 
 

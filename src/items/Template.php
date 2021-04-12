@@ -8,15 +8,6 @@ use esp\weiXin\Send;
 final class Template extends Base implements Send
 {
 
-    private $openID;
-
-    public function setFans(string $openID, string $nick)
-    {
-        $this->openID = $openID;
-        $this->setNick($nick);
-        return $this;
-    }
-
     /**
      * 发送消息
      * @param array $content

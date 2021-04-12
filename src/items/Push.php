@@ -7,18 +7,14 @@ use esp\weiXin\Send;
 
 final class Push extends Base implements Send
 {
-    private $openID;
-    private $nick;
     private $api = "/cgi-bin/message/mass/sendall?access_token={access_token}";
 
-    public function setFans(string $openID, string $nick)
+    public function setPreview()
     {
-        $this->openID = $openID;
-        $this->nick = $nick;
-        $this->setNick($nick);
         $this->api = "/cgi-bin/message/mass/preview?access_token={access_token}";
         return $this;
     }
+
 
     public function send(array $content, array $option = [])
     {
