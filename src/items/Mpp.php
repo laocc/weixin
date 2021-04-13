@@ -19,11 +19,11 @@ final class Mpp extends Base
     /**
      * @param int $id
      * @param string $str
-     * @param int $expire
+     * @param float $expire
      * @return mixed
      * @throws \Exception
      */
-    public function load_QrTick(int $id, string $str, int $expire = 0)
+    public function load_QrTick(int $id, string $str, float $expire = 0)
     {
         //若$expire小于30，则该值表示的为天，转换为秒
         if ($expire > 0 and $expire <= 30) $expire = $expire * 86400;
