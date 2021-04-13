@@ -6,6 +6,7 @@ use esp\core\Debug;
 use esp\http\Http;
 use esp\http\Result;
 use esp\library\ext\Xml;
+use esp\weiXin\platform\Platform;
 
 abstract class Base
 {
