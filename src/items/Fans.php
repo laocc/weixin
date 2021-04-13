@@ -2,8 +2,7 @@
 
 namespace esp\weiXin\items;
 
-
-use esp\weiXin\Platform;
+use esp\weiXin\platform\Platform;
 use esp\weiXin\Base;
 
 final class Fans extends Base

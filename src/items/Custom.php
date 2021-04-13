@@ -7,6 +7,7 @@ use esp\weiXin\Send;
 
 final class Custom extends Base implements Send
 {
+    private $custom;
 
     /**
      * 指定客服

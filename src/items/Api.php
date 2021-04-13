@@ -31,9 +31,10 @@ final class Api extends Base
     /**
      *  生成微信JS-SDK的config
      *
-     * @param string $jsApiList
-     * @param bool|false $debug
-     * @return string|array
+     * @param string $url
+     * @param int $time
+     * @param bool $debug
+     * @return array|string
      *
      * https://mp.weixin.qq.com/wiki/7/aaa137b55fb2e0456bf8dd9148dd613f.html
      */
@@ -113,7 +114,6 @@ final class Api extends Base
         $apiJson = json_encode($arrApi, 256 | 128 | 64);
 
         $js = "<script src='https://res.wx.qq.com/open/js/jweixin-1.4.0.js'>\n//\n";
-//        $js = "<script src='https://res2.wx.qq.com/open/js/jweixin-1.4.0.js'>\n//\n";
         $js .= "</script>\n<script>\nwx.config({$apiJson});\n</script>\n";
 
         return $js;

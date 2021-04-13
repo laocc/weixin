@@ -1,9 +1,7 @@
 <?php
 
-namespace esp\weiXin\items;
+namespace esp\weiXin\platform;
 
-
-use esp\weiXin\Platform;
 
 class Open
 {

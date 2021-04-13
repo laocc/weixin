@@ -57,9 +57,11 @@ final class Auth extends Base
 
     /**
      * 最后校验获取到OpenID的URL
-     * @param $openID
-     * @param $sign
-     * @return bool
+     *
+     * @param array $app
+     * @param string $openID
+     * @param string $sign
+     * @return bool|string
      */
     public function authOpenSignCheck(array $app, string $openID, string $sign)
     {

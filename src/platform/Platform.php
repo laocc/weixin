@@ -1,14 +1,12 @@
 <?php
 
-namespace esp\weiXin;
+namespace esp\weiXin\platform;
 
 use esp\core\db\Redis;
-use esp\core\Input;
 use esp\core\Model;
 use esp\http\Http;
-use esp\weiXin\items\Open;
+use esp\library\request\Get;
 use esp\weiXin\auth\Crypt;
-use function esp\helper\xml_decode;
 
 final class Platform extends Model
 {
@@ -45,9 +43,14 @@ final class Platform extends Model
         $this->AppID = $AppID;  //公众号的APPID
     }
 
+    /**
+     * 切换AppID
+     * @param string $AppID
+     * @return $this
+     */
     public function reAppID(string $AppID)
     {
-        $this->AppID = $AppID;  //公众号的APPID
+        $this->AppID = $AppID;
         return $this;
     }
 
@@ -431,23 +434,18 @@ final class Platform extends Model
      * 9、推送授权相关通知
      * 1，在第三方平台创建审核通过后，微信服务器会向其“授权事件接收URL”每隔10分钟定时推送verify_ticket。
      * 2，当公众号对第三方平台进行授权、取消授权、更新授权后，微信服务器会向第三方平台方的授权事件接收URL（创建第三方平台时填写）推送相关通知。
-     * @return bool
+     * @return string
      * @throws \Exception
      */
     public function acceptGrantEvent()
     {
         $input = file_get_contents("php://input");
         if (empty($input)) return 'null';
-        $post = xml_decode($input, true);
-        $debug = $this->debug($post);
-
-        $sign = Input::get('msg_signature');
-        $time = Input::get('timestamp');
-        $nonce = Input::get('nonce');
+        $debug = $this->debug($input);
+        $get = new Get();
 
         $crypt = new Crypt($this->PlatformAppID, $this->PlatformToken, $this->PlatformEncodingAESKey);
-        $data = $crypt->decode($input, $sign, $time, $nonce);
-//        $data = xml_decode($input, true);
+        $data = $crypt->decode($input, $get['msg_signature'], $get['timestamp'], $get['nonce']);
 
         if (!is_null($debug)) {
             $this->debug($data);
