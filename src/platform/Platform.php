@@ -5,7 +5,6 @@ namespace esp\weiXin\platform;
 use esp\core\db\Redis;
 use esp\core\Model;
 use esp\http\Http;
-use esp\library\request\Get;
 use esp\weiXin\auth\Crypt;
 
 final class Platform extends Model
@@ -442,10 +441,10 @@ final class Platform extends Model
         $input = file_get_contents("php://input");
         if (empty($input)) return 'null';
         $debug = $this->debug($input);
-        $get = new Get();
+        $get = $_GET;
 
         $crypt = new Crypt($this->PlatformAppID, $this->PlatformToken, $this->PlatformEncodingAESKey);
-        $data = $crypt->decode($input, $get['msg_signature'], $get['timestamp'], $get['nonce']);
+        $data = $crypt->decode($input, $get['msg_signature'] ?? '', $get['timestamp'] ?? '', $get['nonce'] ?? '');
 
         if (!is_null($debug)) {
             $this->debug($data);
