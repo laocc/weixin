@@ -27,6 +27,8 @@ final class Custom extends Base implements Send
      * @return bool|mixed|string
      * @throws \Exception
      *
+     * https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Service_Center_messages.html#7
+     *
      * 公众号可以发所有消息，
      *
      * 小程序里的客服只可以发送：
@@ -140,7 +142,7 @@ final class Custom extends Base implements Send
         $reply['miniprogrampage'] = [
             'title' => $content['text']['title'],
             'appid' => $content['app']['appid'],
-            'path' => $content['app']['path'],
+            'pagepath' => $content['app']['path'],
             'thumb_media_id' => $content['image']['id'],
         ];
         return $reply;
