@@ -27,16 +27,29 @@ final class Media extends Base
 
     public function download(string $medIndex)
     {
-        //https://api.weixin.qq.com/cgi-bin/material/get_material?access_token=ACCESS_TOKEN
         $api = "/cgi-bin/material/get_material?access_token={access_token}";
         $rest = $this->Request($api, ['media_id' => $medIndex]);
         return $rest;
     }
 
 
+    /**
+     * @param string $type
+     * @param string $file
+     * @param array $info
+     * @return array|\esp\http\Result|mixed|string
+     * @throws \Exception
+     */
     public function upload(string $type, string $file, array $info = [])
     {
         $api = "/cgi-bin/material/add_material?access_token={access_token}&type={$type}";
+        if (substr($type, 0, 5) === 'temp_') {
+            $type = substr($type, 5);
+            $api = "/cgi-bin/media/upload?access_token={access_token}&type={$type}";
+            if (!in_array($type, ['image', 'voice', 'video', 'thumb'])) {
+                return "临时素材仅支持('image','voice','video','thumb')格式";
+            }
+        }
 
         $option = [];
         $option['type'] = 'upload';
