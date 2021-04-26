@@ -33,7 +33,7 @@ final class Reply extends Base
                 return $this->Image($reply['image']['id']);
                 break;
             case 'transfer_customer_service':
-                return $this->Transfer($reply['text']['customer']);
+                return $this->Transfer($reply['text']['customer'] ?? '');
                 break;
             case 'voice':
                 return $this->Voice($reply['voice']['id']);
