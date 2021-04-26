@@ -33,7 +33,7 @@ final class Reply extends Base
                 return $this->Image($reply['image']['id']);
                 break;
             case 'transfer_customer_service':
-                return $this->Transfer($reply['image']['id']);
+                return $this->Transfer($reply['text']['customer']);
                 break;
             case 'voice':
                 return $this->Voice($reply['voice']['id']);
@@ -71,7 +71,7 @@ final class Reply extends Base
     {
         if ($text === 'success') return $text;
 
-        $reply = $this->_Reply_Template('text');
+        $reply = $this->_Reply_Template('transfer_customer_service');
         if ($text) $reply['TransInfo']['KfAccount'] = ($text);
         $xml = $this->xml($reply);
         return $xml;
