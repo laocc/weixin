@@ -32,6 +32,9 @@ final class Reply extends Base
             case 'image':
                 return $this->Image($reply['image']['id']);
                 break;
+            case 'transfer_customer_service':
+                return $this->Transfer($reply['text']['customer'] ?? '');
+                break;
             case 'voice':
                 return $this->Voice($reply['voice']['id']);
                 break;
@@ -57,6 +60,22 @@ final class Reply extends Base
         return 'success';
     }
 
+
+    /**
+     * 转发客服
+     * @param string $text
+     * @return string
+     * @throws \Exception
+     */
+    public function Transfer(string $text)
+    {
+        if ($text === 'success') return $text;
+
+        $reply = $this->_Reply_Template('transfer_customer_service');
+        if ($text) $reply['TransInfo']['KfAccount'] = ($text);
+        $xml = $this->xml($reply);
+        return $xml;
+    }
 
     /**
      * 文本回复
@@ -172,7 +191,6 @@ final class Reply extends Base
     /**
      * 接入验证，仅在微信官方中配置地址时才会调用到
      * 验证之后，不需要再调用此过程
-     * @throws \\Exception
      * signature    =abb122b9ae77c1af86e7846f29bfee5534027c71&
      * echostr      =7777285193039077214&
      * timestamp    =1462410074&
