@@ -17,20 +17,23 @@ final class Pay extends Base
 
     public function refundPay(array $payment)
     {
-        if ($payment['notify_url'][0] === '/') $payment['notify_url'] = _HTTP_ . "api." . _HOST . $payment['notify_url'];
+        $notifyUrl = $payment['notify'] ?? $payment['notify_url'];
+        if ($notifyUrl[0] === '/') $notifyUrl = _HTTP_ . "api." . _HOST . $notifyUrl;
 
         $payInfo = array();
         $payInfo['appid'] = $this->mch['appid'];
         $payInfo['mch_id'] = $this->mch['mchid'];
         $payInfo['nonce_str'] = str_rand(15);
         $payInfo['sign_type'] = 'MD5';
-        $payInfo['transaction_id'] = $payment['transaction_id'];
-        $payInfo['out_trade_no'] = $payment['out_trade_no'];
-        $payInfo['out_refund_no'] = $payment['out_refund_no'];
-        $payInfo['total_fee'] = $payment['total_fee'];
-        $payInfo['refund_fee'] = $payment['refund_fee'];
-        $payInfo['refund_desc'] = $payment['refund_desc'];
-        $payInfo['notify_url'] = $payment['notify_url'];
+
+        $payInfo['transaction_id'] = $payment['transaction'] ?? $payment['transaction_id'];
+        $payInfo['out_trade_no'] = $payment['trade'] ?? $payment['out_trade_no'];
+        $payInfo['out_refund_no'] = $payment['number'] ?? $payment['out_refund_no'];
+        $payInfo['total_fee'] = $payment['total'] ?? $payment['total_fee'];
+        $payInfo['refund_fee'] = $payment['amount'] ?? $payment['refund_fee'];
+        $payInfo['refund_desc'] = $payment['reason'] ?? $payment['refund_desc'];
+
+        $payInfo['notify_url'] = $notifyUrl;
         $payInfo['refund_fee_type'] = 'CNY';
         $payInfo['sign'] = $this->createSign($payInfo, $this->mch['key']);//签名，详见签名生成算法
 
