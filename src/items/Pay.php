@@ -26,8 +26,14 @@ final class Pay extends Base
         $payInfo['nonce_str'] = str_rand(15);
         $payInfo['sign_type'] = 'MD5';
 
-        $payInfo['transaction_id'] = $payment['transaction'] ?? $payment['transaction_id'];
-        $payInfo['out_trade_no'] = $payment['trade'] ?? $payment['out_trade_no'];
+        if (isset($payment['transaction'])) $payInfo['transaction_id'] = $payment['transaction'];
+        else if (isset($payment['transaction_id'])) $payInfo['transaction_id'] = $payment['transaction_id'];
+
+        if (isset($payment['trade'])) $payInfo['out_trade_no'] = $payment['trade'];
+        else if (isset($payment['out_trade_no'])) $payInfo['out_trade_no'] = $payment['out_trade_no'];
+
+        if (!isset($payInfo['transaction_id']) and !isset($payInfo['out_trade_no'])) return '微信支付号或商户支付号必须二选一';
+
         $payInfo['out_refund_no'] = $payment['number'] ?? $payment['out_refund_no'];
         $payInfo['total_fee'] = $payment['total'] ?? $payment['total_fee'];
         $payInfo['refund_fee'] = $payment['amount'] ?? $payment['refund_fee'];
