@@ -125,7 +125,7 @@ abstract class Base
         }
         if ($api[0] !== 'h') $api = "{$this->host}{$api}";
 
-        $request = (new Http($option))->data($data)->post($api);
+        $request = (new Http($option))->data($data)->request($api);
 
         $this->debug([$api, $data, $option, $request]);
         if ($err = $request->error()) return $err;
