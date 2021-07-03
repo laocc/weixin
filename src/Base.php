@@ -4,7 +4,7 @@ namespace esp\weiXin;
 
 use esp\core\Debug;
 use esp\http\Http;
-use esp\http\Result;
+use esp\http\HttpResult;
 use esp\library\ext\Xml;
 use esp\weiXin\platform\Platform;
 
@@ -95,11 +95,11 @@ abstract class Base
     }
 
     /**
-     * @param $url
+     * @param string $url
      * @param null $data
      * @param array $option
      * @param null $cert
-     * @return array|mixed|string|Result
+     * @return array|HttpResult|mixed|null|string
      * @throws \Exception
      */
     final public function Request(string $url, $data = null, array $option = [], $cert = null)
