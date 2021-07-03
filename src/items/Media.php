@@ -37,7 +37,7 @@ final class Media extends Base
      * @param string $type
      * @param string $file
      * @param array $info
-     * @return array|\esp\http\Result|mixed|string
+     * @return array|\esp\http\HttpResult|mixed|string
      * @throws \Exception
      */
     public function upload(string $type, string $file, array $info = [])

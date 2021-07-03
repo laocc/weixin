@@ -64,7 +64,7 @@ class Subscribe extends Base
     /**
      * 获取所有已注册的模版
      * @param string $tempID
-     * @return array|\esp\http\Result|mixed|string
+     * @return array|\esp\http\HttpResult|mixed|string
      * @throws \Exception
      */
     public function getAllTemplate(string $tempID = '')
@@ -114,7 +114,7 @@ class Subscribe extends Base
      * @param string $openID
      * @param array $app
      * @param array $mpp
-     * @return array|bool|\esp\http\Result|mixed|string
+     * @return array|bool|\esp\http\HttpResult|mixed|string
      * @throws \Exception
      *
      * https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/uniform-message/uniformMessage.send.html
