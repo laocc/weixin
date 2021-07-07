@@ -3,15 +3,12 @@
 namespace esp\weiXin\platform;
 
 use esp\core\db\Redis;
-use esp\core\Model;
+use esp\core\Library;
 use esp\http\Http;
 use esp\weiXin\auth\Crypt;
 
-final class Platform extends Model
+final class Platform extends Library
 {
-    public $_table = 'Platform';
-    public $_id = 'ID';
-
     private $api = 'https://api.weixin.qq.com';
     public $AppID;
     public $AppAdminID;

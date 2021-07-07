@@ -2,32 +2,29 @@
 
 namespace esp\weiXin;
 
-use esp\core\Debug;
+use esp\core\Library;
 use esp\http\Http;
 use esp\http\HttpResult;
 use esp\library\ext\Xml;
 use esp\weiXin\platform\Platform;
 
-abstract class Base
+abstract class Base extends Library
 {
     protected $conf;
     protected $AppID;
-
-    private $path;
-
-    public $host = 'https://api.weixin.qq.com';
-
-    public $mpp;
-    public $openID;
-    public $nick;
-
-    public $Platform;
-
     protected $Hash;
     protected $redis;
     protected $debug;
 
-    public function __construct(array $conf, Debug $debug = null)
+    private $path;
+
+    public $host = 'https://api.weixin.qq.com';
+    public $mpp;
+    public $openID;
+    public $nick;
+    public $Platform;
+
+    public function _init(array $conf)
     {
         if (empty($conf['appid'] ?? '')) $conf['appid'] = $conf['mppAppID'] ?? '';
         if (empty($conf['secret'] ?? '')) $conf['secret'] = $conf['mppSecret'] ?? '';
@@ -40,7 +37,6 @@ abstract class Base
         if (!is_dir($this->path)) mkdir($this->path, 0740, true);
         $this->conf = $conf;
         $this->AppID = $conf['appid'];
-        $this->debug = $debug;
 
         if (isset($conf['platform'])) $this->Platform = $conf['platform'];
         unset($conf['platform']);
@@ -69,19 +65,6 @@ abstract class Base
         return file_put_contents("{$this->path}/{$name}", serialize($value)) > 0;
     }
 
-
-    /**
-     * @param $val
-     * @param null $prev
-     * @return Debug|bool
-     */
-    public function debug($val, $prev = null)
-    {
-        if (is_null($this->debug)) return false;
-        if (is_null($val)) return $this->debug;
-        $prev = is_null($prev) ? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0] : $prev;
-        return $this->debug->relay($val, $prev);
-    }
 
     /**
      * @param array $xml
