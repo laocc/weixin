@@ -205,7 +205,7 @@ final class Reply extends Base
         $signature = $get->string('signature');
         $nonce = $get->string('nonce');
 
-        $tmpArr = [$this->mpp['mppToken'], $timestamp, $nonce];
+        $tmpArr = [$this->mpp['token'], $timestamp, $nonce];
         sort($tmpArr, SORT_STRING);
 
         return (sha1(implode($tmpArr)) === $signature) ? $echostr : 'Fail';
@@ -221,7 +221,7 @@ final class Reply extends Base
     {
         $xml = array();
         $xml['ToUserName'] = $this->openID;
-        $xml['FromUserName'] = $this->mpp['mppRealID'];//系统微信号
+        $xml['FromUserName'] = $this->mpp['realid'];//系统微信号
         $xml['CreateTime'] = time();
         $xml['MsgType'] = $type;
         return $xml;

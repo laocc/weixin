@@ -93,7 +93,7 @@ final class Fans extends Base
             $param['component_appid'] = $this->Platform->PlatformAppID;
             $url = "{$this->Platform->PlatformURL}/user/openid/{$this->AppID}/{$isPay}/{$uri_base}/{$time}/{$sign}/";
         } else {
-            $url = "{$this->mpp['mppDomain']}/login/openid/{$this->AppID}/{$isPay}/{$uri_base}/{$time}/{$sign}/";
+            $url = "{$this->mpp['domain']}/login/openid/{$this->AppID}/{$isPay}/{$uri_base}/{$time}/{$sign}/";
         }
 
         $param['redirect_uri'] = $url;
@@ -134,7 +134,7 @@ final class Fans extends Base
                 $param['component_appid'] = $this->Platform->PlatformAppID;
                 $url = "{$this->Platform->PlatformURL}/user/openid/{$this->AppID}/{$isPay}/{$uri_base}/{$state}/";
             } else {
-                $url = "{$this->mpp['mppDomain']}/login/openid/{$this->AppID}/{$isPay}/{$uri_base}/{$state}/";
+                $url = "{$this->mpp['domain']}/login/openid/{$this->AppID}/{$isPay}/{$uri_base}/{$state}/";
             }
 
             $param['redirect_uri'] = $url;
@@ -151,7 +151,7 @@ final class Fans extends Base
         if ($_GET['state'] !== $state) return "state与传入值不一致";
         $param = [];
         $param['appid'] = $this->AppID;
-        $param['secret'] = $this->mpp['mppSecret'];
+        $param['secret'] = $this->mpp['secret'];
         $param['code'] = $_GET['code'];
         $param['grant_type'] = 'authorization_code';
         $args = http_build_query($param);

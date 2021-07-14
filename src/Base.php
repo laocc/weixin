@@ -24,23 +24,50 @@ abstract class Base extends Library
     public $nick;
     public $Platform;
 
-    public function _init(array $conf)
+    public function _init(array $data)
     {
-        if (empty($conf['appid'] ?? '')) $conf['appid'] = $conf['mppAppID'] ?? '';
-        if (empty($conf['secret'] ?? '')) $conf['secret'] = $conf['mppSecret'] ?? '';
+        $conf = [];
+        foreach ($data as $k => $v) {
+            if (preg_match('/^[amt]pp[A-Z]\w+/', $k)) $k = substr($k, 3);
+            $conf[strtolower($k)] = $v;
+        }
 
         if (empty($conf['appid'])) {
-            throw new \Error("wx conf 至少要含有appid:" . json_encode($conf, 256 | 64));
+            throw new \Error("wx conf 至少要含有appid:" . json_encode($data, 256 | 64));
         }
 
         $this->path = "/tmp/wx/{$conf['appid']}";
-        if (!is_dir($this->path)) mkdir($this->path, 0740, true);
+        if (!is_dir($this->path)) mkdir($this->path, 0744, true);
         $this->conf = $conf;
         $this->AppID = $conf['appid'];
 
         if (isset($conf['platform'])) $this->Platform = $conf['platform'];
         unset($conf['platform']);
-        if (isset($conf['mppAppID'])) $this->mpp = $conf;
+        if (isset($data['mppAppID'])) $this->mpp = $conf;
+    }
+
+    /**
+     * 切换网站
+     * @param array $mpp
+     * @return $this
+     * @throws \Exception
+     */
+    public function changeMpp(array $mpp)
+    {
+        $conf = [];
+        foreach ($mpp as $k => $v) {
+            if (preg_match('/^[amt]pp[A-Z]\w+/', $k)) $k = substr($k, 3);
+            $conf[strtolower($k)] = $v;
+        }
+
+        $this->mpp = $conf;
+        $this->AppID = $conf['appid'];
+        $this->conf = ['appid' => $conf['appid'], 'secret' => $conf['secret']];
+
+        $this->path = "/tmp/wx/{$this->AppID}";
+        if (!is_dir($this->path)) mkdir($this->path, 0740, true);
+
+        return $this;
     }
 
 
@@ -268,12 +295,12 @@ abstract class Base extends Library
 
         $key = [];
         $key['AppID'] = $this->AppID;
-        $key['AppName'] = $this->mpp['mppName'];
-        $key['RealID'] = $this->mpp['mppRealID'];
+        $key['AppName'] = $this->mpp['name'];
+        $key['RealID'] = $this->mpp['realid'];
         $key['OpenID'] = $this->openID;
         $key['Nick'] = $this->nick;
 
-        $setup = $this->mpp['mppSetup'];
+        $setup = $this->mpp['setup'];
         if (is_string($setup)) $setup = json_decode($setup, true) ?: [];
 
         if (isset($setup['var'])) {
@@ -291,27 +318,9 @@ abstract class Base extends Library
 
     public function mppAuth(array $Disable)
     {
-        return in_array($this->mpp['mppType'], $Disable) ? '公众号没有此接口权限' : false;
+        return in_array($this->mpp['type'], $Disable) ? '公众号没有此接口权限' : false;
     }
 
-
-    /**
-     * 后台群发中心切换网站
-     * @param array $mpp
-     * @return $this
-     * @throws \Exception
-     */
-    public function changeMpp(array $mpp)
-    {
-        $this->mpp = $mpp;
-        $this->AppID = $mpp['mppAppID'];
-        $this->conf = ['appid' => $mpp['mppAppID'], 'secret' => $mpp['mppSecret']];
-
-        $this->path = "/tmp/wx/{$this->AppID}";
-        if (!is_dir($this->path)) mkdir($this->path, 0740, true);
-
-        return $this;
-    }
 
     /**
      * @param Platform $plat
