@@ -41,7 +41,7 @@ final class Pay extends Base
 
         $payInfo['notify_url'] = $notifyUrl;
         $payInfo['refund_fee_type'] = 'CNY';
-        $payInfo['sign'] = $this->createSign($payInfo, $this->mch['key']);//签名，详见签名生成算法
+        $payInfo['sign'] = $this->createSign($payInfo, $this->mch['token']);//签名，详见签名生成算法
 
         $payInfoXml = $this->xml($payInfo);
         $this->debug([$this->mch, $payInfo, $payInfoXml]);
@@ -59,7 +59,7 @@ final class Pay extends Base
         if (!is_array($content)) return "{$err}{$content}";
         if ($content['return_code'] !== 'SUCCESS') return "{$err}{$content['return_msg']}";        //生成支付时错误
         if ($content['result_code'] !== 'SUCCESS') return "{$err}{$content['err_code_des']}";        //生成支付时错误
-        if (!$this->checkSign($content, $this->mch['key'])) return "{$err}返回签名错误";
+        if (!$this->checkSign($content, $this->mch['token'])) return "{$err}返回签名错误";
 
         return $content;
     }
@@ -71,12 +71,14 @@ final class Pay extends Base
      */
     public function deCodeCryptRefund(string $code)
     {
-        return openssl_decrypt(base64_decode($code), "AES-256-ECB", md5($this->mch['key']), OPENSSL_RAW_DATA);
+        return openssl_decrypt(base64_decode($code), "AES-256-ECB", md5($this->mch['token']), OPENSSL_RAW_DATA);
     }
 
 
     /**
      * 生成模式一的二维支付，此二维码永久有效
+     * @param $shopID
+     * @return string
      */
     public function createQrCode($shopID)
     {
