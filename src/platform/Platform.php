@@ -473,7 +473,7 @@ final class Platform extends Library
                 ]);
 
                 if ($data['InfoType'] === 'authorized') {
-                    $this->_buffer->publish('order', 'asyncMpp', ['_action' => 'asyncMpp', 'mppAppID' => $this->AppID]);
+                    $this->_redis->publish('order', 'asyncMpp', ['_action' => 'asyncMpp', 'mppAppID' => $this->AppID]);
                 }
 
                 break;
@@ -488,7 +488,7 @@ final class Platform extends Library
 
     final protected function task(string $action, $value)
     {
-        return $this->_buffer->publish('order', $action, ['_action' => $action] + $value);
+        return $this->_redis->publish('order', $action, ['_action' => $action] + $value);
     }
 
     public function loadOpenID()
