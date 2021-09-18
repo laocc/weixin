@@ -92,6 +92,7 @@ final class Custom extends Base implements Send
         $v['appid'] = "";
         $v['path'] = "";
         $v['text'] = $content['text']['desc'] ?? ($content['text'] ?? '');
+        if (strpos($v['text'], '<a') !== false) $content['link'] = null;
 
         if (!empty($content['link'])) {
             $v['href'] = " href='{$content['link']}'";
