@@ -3,6 +3,7 @@
 namespace esp\weiXin\items;
 
 use esp\weiXin\Base;
+use Exception;
 
 final class Tag extends Base
 {
@@ -19,13 +20,38 @@ final class Tag extends Base
         return ($rest['tags']);
     }
 
+    /**
+     * 打标
+     *
+     * @param array $openID
+     * @param int $tagID
+     * @return false|mixed|string
+     * @throws Exception
+     */
     public function batch(array $openID, int $tagID)
     {
         if ($disable = $this->mppAuth([1, 4])) return $disable;
         $api = "/cgi-bin/tags/members/batchtagging?access_token={access_token}";
         $rest = $this->Request($api, ['openid_list' => $openID, 'tagid' => $tagID]);
         if (is_string($rest)) return $rest;
-        return $rest['errmsg'];
+        return $rest['errcode'] === 0;
+    }
+
+    /**
+     * 将用户从群组移出
+     *
+     * @param array $openID
+     * @param int $tagID
+     * @return false|mixed|string
+     * @throws Exception
+     */
+    public function move(array $openID, int $tagID)
+    {
+        if ($disable = $this->mppAuth([1, 4])) return $disable;
+        $api = "/cgi-bin/tags/members/batchuntagging?access_token={access_token}";
+        $rest = $this->Request($api, ['openid_list' => $openID, 'tagid' => $tagID]);
+        if (is_string($rest)) return $rest;
+        return $rest['errcode'] === 0;
     }
 
     public function create(string $name)
@@ -42,7 +68,7 @@ final class Tag extends Base
      * 5. 获取标签下粉丝列表
      * @param string $name
      * @return array|bool|int|mixed|string
-     * @throws \Exception
+     * @throws Exception
      */
     public function load(string $name)
     {
