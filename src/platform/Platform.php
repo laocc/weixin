@@ -503,7 +503,8 @@ final class Platform extends Library
     {
         $data = $_GET['data'] ?? '';
         $sign = $_GET['sign'] ?? '';
-        $array = json_decode(base64_decode(urldecode($data)));
+        if (empty($data) or empty($sign)) return '三方平台返回Data错误';
+        $array = json_decode(base64_decode(urldecode($data)), true);
         if (empty($array)) return '三方平台返回Data错误';
         $str = md5($array['appid'] . $data . 'OPENID');
         if ($str !== $sign) return '三方平台返回URL签名错误';
