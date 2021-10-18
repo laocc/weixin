@@ -22,6 +22,9 @@ abstract class Base extends Library
     public $mpp;
     public $openID;
     public $nick;
+    /**
+     * @var $Platform Platform
+     */
     public $Platform;
 
     public function _init(array $data)

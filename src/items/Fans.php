@@ -4,6 +4,7 @@ namespace esp\weiXin\items;
 
 use esp\weiXin\platform\Platform;
 use esp\weiXin\Base;
+use Exception;
 
 final class Fans extends Base
 {
@@ -13,7 +14,7 @@ final class Fans extends Base
      * https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421140839
      * @param $OpenID
      * @return array|mixed|string
-     * @throws \Exception
+     * @throws Exception
      */
     public function load_FansInfo($OpenID)
     {
@@ -28,7 +29,7 @@ final class Fans extends Base
      * @param $call
      * @param $next
      * @return int
-     * @throws \Exception
+     * @throws Exception
      * https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421140840
      */
     public function load_AllFans(callable $call, string $next = '')
@@ -89,7 +90,6 @@ final class Fans extends Base
         $time = getenv('REQUEST_TIME_FLOAT') . '.' . mt_rand();
         $sign = md5($this->AppID . $time . 'OPENID');
         if ($this->Platform) {
-            if (0) $this->Platform instanceof Platform and 1;
             $param['component_appid'] = $this->Platform->PlatformAppID;
             $url = "{$this->Platform->PlatformURL}/user/openid/{$this->AppID}/{$isPay}/{$uri_base}/{$time}/{$sign}/";
         } else {
@@ -105,12 +105,12 @@ final class Fans extends Base
     }
 
     /**
-     * @param bool $getWayOpenID
+     * @param bool $isPay
+     * @param string|null $backUrl
      * @return array|string
-     * array:用户信息
-     * string:要跳入的URL，或错误信息
+     * @throws Exception
      */
-    public function load_OpenID(bool $getWayOpenID = false)
+    public function load_OpenID(bool $isPay = false, string $backUrl = null)
     {
         //state标识 重定向后会带上state参数，开发者可以填写a-zA-Z0-9的参数值
         $state = md5(date('Ymd') . $this->AppID);
@@ -118,9 +118,9 @@ final class Fans extends Base
         if (!isset($_GET['code']) or !isset($_GET['state'])) {
 
             //最后要跳回来的页面，也就是当前页面
-            $uri = _HTTP_ . getenv('HTTP_HOST') . getenv('REQUEST_URI');
-            $uri_base = urlencode(base64_encode($uri));
-            $isPay = $getWayOpenID ? 1 : 0;
+            if (is_null($backUrl)) $backUrl = _HTTP_ . getenv('HTTP_HOST') . getenv('REQUEST_URI');
+            $uri_base = urlencode(base64_encode($backUrl));
+            $isPay = $isPay ? 1 : 0;
 
             $param = [];
             $param['appid'] = $this->AppID;
@@ -130,7 +130,6 @@ final class Fans extends Base
             $param['state'] = $state;
 
             if ($this->Platform) {
-                if (0) $this->Platform instanceof Platform and 1;
                 $param['component_appid'] = $this->Platform->PlatformAppID;
                 $url = "{$this->Platform->PlatformURL}/user/openid/{$this->AppID}/{$isPay}/{$uri_base}/{$state}/";
             } else {
@@ -140,7 +139,7 @@ final class Fans extends Base
             $param['redirect_uri'] = $url;
             $args = http_build_query($param);
             $api = "https://open.weixin.qq.com/connect/oauth2/authorize?{$args}#wechat_redirect";
-            $this->debug(['appURL' => $uri, 'redirectURL' => $url, 'redirectAPI' => $api, 'param' => $param]);
+            $this->debug(['backUrl' => $backUrl, 'redirectURL' => $url, 'redirectAPI' => $api, 'param' => $param]);
             return $api;
         }
 
