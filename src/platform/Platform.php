@@ -540,7 +540,7 @@ final class Platform extends Library
         $hasTry = false;
         tryGet:
         $param = [];
-        $param['appid'] = $this->AppID;
+        $param['appid'] = $array['appid'];
         $param['code'] = $_GET['code'];
         $param['grant_type'] = 'authorization_code';
         $param['component_appid'] = $this->PlatformAppID;
