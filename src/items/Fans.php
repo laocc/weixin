@@ -66,7 +66,7 @@ final class Fans extends Base
      *
      * @param array $option
      */
-    public function redirect(array $option)
+    public function redirectWeixin(array $option)
     {
         $backUrl = $option['url'] ?? null;  //最后要跳回来的页面
         if (is_null($backUrl)) $backUrl = _HTTP_ . getenv('HTTP_HOST') . getenv('REQUEST_URI');
@@ -100,25 +100,34 @@ final class Fans extends Base
         $api = "https://open.weixin.qq.com/connect/oauth2/authorize?{$args}#wechat_redirect";
 
         $this->debug(['appURL' => $backUrl, 'redirectAPI' => $api, 'param' => $param]);
-        header('Expires: ' . gmdate('D, d M Y H:i:s', time() - 1) . ' GMT');
-        header("Cache-Control: no-cache");
-        header("Pragma: no-cache");
-        header("Location: {$api}");
-        fastcgi_finish_request();
-        exit;
+        $this->redirect($api);
     }
 
     /**
      * @param array $option
      * @return array|string
+     *
+     * 两种情况：
+     * 1，由第三方平台受理；
+     * 2，直连微信公众号；
+     *
+     *
+     *
      */
     public function load_OpenID(array $option = [])
     {
-        if (!isset($_GET['code']) or !isset($_GET['state'])) $this->redirect($option);
+        $openIdKey = '_openid_';
+        /**
+         * 原始页面，获取到三方平台跳回来时所带的openID
+         */
+        if (isset($_GET[$openIdKey])) return ['openid' => $_GET['openid']];
+
+        if (!isset($_GET['code']) or !isset($_GET['state'])) $this->redirectWeixin($option);
 
         if (!$this->sign_url($_GET['state'])) return "state与传入值不一致";
 
         if ($this->Platform) {
+            //三方平台，受理微信跳回来的数据
             $uri = parse_url(getenv('REQUEST_URI'), PHP_URL_PATH);
             $uri = explode('/', $uri);
             if (count($uri) < 3) return '三方平台回传URL错误';
@@ -129,16 +138,13 @@ final class Fans extends Base
 
             $platData = $this->Platform->loadOpenID();
             $fh = strpos($platData['back'], '?') ? '&' : '?';
-            $redirect = "{$platData['back']}{$fh}openid={$platData['openid']}";
-
-            header('Expires: ' . gmdate('D, d M Y H:i:s', time() - 1) . ' GMT');
-            header("Cache-Control: no-cache");
-            header("Pragma: no-cache");
-            header("Location: {$redirect}");
-            fastcgi_finish_request();
+            $redirect = "{$platData['back']}{$fh}{$openIdKey}={$platData['openid']}";
+            //跳回原始页面
+            $this->redirect($redirect);
             exit;
         }
 
+        //直连微信公众号平台时，处理回传的数据
         $param = [];
         $param['appid'] = $this->AppID;
         $param['secret'] = $this->mpp['secret'];
@@ -149,7 +155,21 @@ final class Fans extends Base
         $content = $this->Request("/sns/oauth2/access_token?{$args}");
         if (!is_array($content)) return $content;
         if (!isset($content['openid'])) return json_encode($content, 256);
+
+        /**
+         * 这时$content里已带有openid
+         */
         return $content;
+    }
+
+    private function redirect(string $redirect)
+    {
+        header('Expires: ' . gmdate('D, d M Y H:i:s', time() - 1) . ' GMT');
+        header("Cache-Control: no-cache");
+        header("Pragma: no-cache");
+        header("Location: {$redirect}");
+        fastcgi_finish_request();
+        exit;
     }
 
     /**
