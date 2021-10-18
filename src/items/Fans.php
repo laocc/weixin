@@ -127,7 +127,7 @@ final class Fans extends Base
             $str = ($_GET["{$this->openIdKey}sign"] ?? 'e');
             if ($sign !== $str) {
                 $sign = md5($this->openIdKey . '=' . $openID . 'OpenID' . date('Ymd', time() - 5));
-                if ($sign !== $str) return 'fail url';
+                if ($sign !== $str) $this->redirectWeixin($option);
             }
             return ['openid' => $openID];
         }
