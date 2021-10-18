@@ -495,17 +495,17 @@ final class Platform extends Library
     }
 
     /**
-     * @return string
+     * @return string|array
      *
      * 这里的数据是Fans中组合的，签名规则也是在Fans()->redirectWeixin()中创建的
      *
      */
-    private function checkData()
+    private function checkOpenIDData()
     {
         $data = $_GET['data'] ?? '';
         $sign = $_GET['sign'] ?? '';
         if (empty($data) or empty($sign)) return '三方平台返回Data错误';
-        $array = json_decode(base64_decode(urldecode($data)), true);
+        $array = json_decode(gzuncompress(base64_decode(urldecode($data))), true);
         if (empty($array)) return '三方平台返回Data错误';
         $str = md5($array['appid'] . $data . 'OPENID');
         if ($str !== $sign) return '三方平台返回URL签名错误';
@@ -522,7 +522,7 @@ final class Platform extends Library
     {
         if (!isset($_GET['code'])) return null;
 
-        $array = $this->checkData();
+        $array = $this->checkOpenIDData();
         if (is_string($array)) return $array;
         $this->debug($array);
         $fh = strpos($array['back'], '?') ? '&' : '?';

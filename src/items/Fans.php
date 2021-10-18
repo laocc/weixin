@@ -85,9 +85,9 @@ final class Fans extends Base
                 'pay' => $option['pay'] ?? 0,
                 'back' => $backUrl,
                 'key' => $this->openIdKey,
-                'time' => mt_rand(),
+                '_' => mt_rand(),
             ];
-            $data = urlencode(base64_encode(json_encode($data, 320)));
+            $data = urlencode(base64_encode(gzcompress(json_encode($data, 320), 5)));
             $sign = md5($this->AppID . $data . 'OPENID');
             //需在第三方平台所绑定的域名下实现下列URI，两个参数
             $platUri = rtrim($option['platform'] ?? '/fans/openid', '/');
@@ -113,8 +113,6 @@ final class Fans extends Base
      * 两种情况：
      * 1，由第三方平台受理；
      * 2，直连微信公众号；
-     *
-     *
      *
      */
     public function load_OpenID(array $option = [])
