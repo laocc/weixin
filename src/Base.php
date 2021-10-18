@@ -78,7 +78,6 @@ abstract class Base extends Library
      * @param string $name
      * @param null $value
      * @return array|int|string
-     * @throws \Exception
      *
      * 目前只用于存储：
      * Access_Token：自主接入时，此值为单独获取，如果是授权接入，则由platform读取
@@ -113,7 +112,6 @@ abstract class Base extends Library
      * @param array $option
      * @param null $cert
      * @return array|HttpResult|mixed|null|string
-     * @throws \Exception
      */
     final public function Request(string $url, $data = null, array $option = [], $cert = null)
     {
@@ -220,7 +218,6 @@ abstract class Base extends Library
      * 下载AccessToken
      * https://mp.weixin.qq.com/wiki/11/0e4b294685f817b95cbed85ba5e82b8f.html
      * @return array|string
-     * @throws \Exception
      */
     public function load_AccessToken()
     {

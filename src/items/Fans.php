@@ -2,7 +2,6 @@
 
 namespace esp\weiXin\items;
 
-use esp\weiXin\platform\Platform;
 use esp\weiXin\Base;
 use Exception;
 
@@ -71,7 +70,6 @@ final class Fans extends Base
     {
         $backUrl = $option['url'] ?? null;  //最后要跳回来的页面
         if (is_null($backUrl)) $backUrl = _HTTP_ . getenv('HTTP_HOST') . getenv('REQUEST_URI');
-        $uri_base = urlencode(base64_encode($backUrl));
 
         $param = [];
         $param['appid'] = $this->AppID;
@@ -79,24 +77,29 @@ final class Fans extends Base
         $param['response_type'] = 'code';
         $param['scope'] = ($option['scope'] ?? 'snsapi_base');//"snsapi_userinfo" : 'snsapi_base'
         $param['state'] = $this->sign_url();
+        $param['redirect_uri'] = $backUrl;
 
-        $isPay = ($option['pay'] ?? 0) ? 1 : 0;
-
-        $time = getenv('REQUEST_TIME_FLOAT') . '.' . mt_rand();
-        $sign = md5($this->AppID . $time . 'OPENID');
         if ($this->Platform) {
+            $data = [
+                'appid' => $this->AppID,
+                'pay' => $option['pay'] ?? 0,
+                'back' => $backUrl,
+                'time' => mt_rand(),
+            ];
+            $data = urlencode(base64_encode(json_encode($data, 320)));
+            $sign = md5($this->AppID . $data . 'OPENID');
+            //需在第三方平台所绑定的域名下实现下列URI，两个参数
+            /**
+             *
+             */
+            $param['redirect_uri'] = "{$this->Platform->PlatformURL}/user/openid/{$data}/{$sign}";
             $param['component_appid'] = $this->Platform->PlatformAppID;
-            $url = "{$this->Platform->PlatformURL}/user/openid/{$this->AppID}/{$isPay}/{$uri_base}/{$time}/{$sign}/";
-        } else {
-            $url = "{$this->mpp['domain']}/login/openid/{$this->AppID}/{$isPay}/{$uri_base}/{$time}/{$sign}/";
         }
 
-//        $param['redirect_uri'] = $url;
-        $param['redirect_uri'] = $backUrl;
         $args = http_build_query($param);
         $api = "https://open.weixin.qq.com/connect/oauth2/authorize?{$args}#wechat_redirect";
 
-        $this->debug(['appURL' => $backUrl, 'redirectURL' => $url, 'redirectAPI' => $api, 'param' => $param]);
+        $this->debug(['appURL' => $backUrl, 'redirectAPI' => $api, 'param' => $param]);
         header('Expires: ' . gmdate('D, d M Y H:i:s', time() - 1) . ' GMT');
         header("Cache-Control: no-cache");
         header("Pragma: no-cache");
@@ -106,29 +109,35 @@ final class Fans extends Base
     }
 
     /**
-     * @param string|null $state
-     * @return bool|string
-     */
-    private function sign_url(string $state = null)
-    {
-        $token = md5(date('Ymd') . $this->AppID);
-        if (is_null($state)) return $token;
-
-        return $token === $state;
-    }
-
-    /**
      * @param array $option
      * @return array|string
-     * @throws Exception
      */
-    public function load_OpenID(array $option)
+    public function load_OpenID(array $option = [])
     {
         if (!isset($_GET['code']) or !isset($_GET['state'])) $this->redirect($option);
 
         if (!$this->sign_url($_GET['state'])) return "state与传入值不一致";
 
-        if ($this->Platform) return $this->Platform->loadOpenID();
+        if ($this->Platform) {
+            $uri = parse_url(getenv('REQUEST_URI'), PHP_URL_PATH);
+            $uri = explode('/', $uri);
+            if (count($uri) < 3) return '三方平台回传URL错误';
+            $array = json_decode(base64_decode(urldecode($uri[1])));
+            if (empty($array)) return '三方平台返回Data错误';
+            $str = md5($array['appid'] . $uri[1] . 'OPENID');
+            if ($str !== $uri[2]) return '三方平台返回URL签名错误';
+
+            $platData = $this->Platform->loadOpenID();
+            $fh = strpos($platData['back'], '?') ? '&' : '?';
+            $redirect = "{$platData['back']}{$fh}openid={$platData['openid']}";
+
+            header('Expires: ' . gmdate('D, d M Y H:i:s', time() - 1) . ' GMT');
+            header("Cache-Control: no-cache");
+            header("Pragma: no-cache");
+            header("Location: {$redirect}");
+            fastcgi_finish_request();
+            exit;
+        }
 
         $param = [];
         $param['appid'] = $this->AppID;
@@ -141,6 +150,18 @@ final class Fans extends Base
         if (!is_array($content)) return $content;
         if (!isset($content['openid'])) return json_encode($content, 256);
         return $content;
+    }
+
+    /**
+     * @param string|null $state
+     * @return bool|string
+     */
+    private function sign_url(string $state = null)
+    {
+        $token = md5(date('Ymd') . $this->AppID);
+        if (is_null($state)) return $token;
+
+        return $token === $state;
     }
 
 }

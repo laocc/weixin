@@ -6,6 +6,7 @@ use esp\core\db\Redis;
 use esp\core\Library;
 use esp\http\Http;
 use esp\weiXin\auth\Crypt;
+use Exception;
 
 final class Platform extends Library
 {
@@ -82,7 +83,7 @@ final class Platform extends Library
      * @param $adminID
      * @param $type
      * @return array|string
-     * @throws \Exception
+     * @throws Exception
      */
     public function CreateAccessGrantCode(int $adminID, int $type = 1)
     {
@@ -104,7 +105,7 @@ final class Platform extends Library
      * @param $appID
      * @param $true
      * @return array|string
-     * @throws \Exception
+     * @throws Exception
      * /?auth_code=queryauthcode@@@9dTChTMS0-dL2InzvcyY5UU4slUyAfNRNZQ7UzouB_0S_XP_PY6D_HphnrzkezgW3yMXHumkhhKXPZHajYEU2Q&expires_in=3600
      */
     /**
@@ -133,8 +134,9 @@ final class Platform extends Library
 
     /**
      * 2、获取第三方平台.component_access_token
+     * @param bool $byHash
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function PlatformAccessToken(bool $byHash = true)
     {
@@ -151,7 +153,7 @@ final class Platform extends Library
                 $Ticket = file_get_contents($fil);
                 $this->Hash->set('Verify_Ticket', $Ticket);
             } else {
-                throw new \Exception("{$this->PlatformAppID} Verify_Ticket 丢失");
+                throw new Exception("{$this->PlatformAppID} Verify_Ticket 丢失");
             }
         }
 
@@ -165,7 +167,7 @@ final class Platform extends Library
         $value = $this->Request($api, $data);
         if (is_string($value)) {
             print_r($data);
-            throw new \Exception($value, 500);
+            throw new Exception($value, 500);
         }
 
         $code = ['token' => $value['component_access_token'], 'time' => date('Y-m-d H:i:s', $time), 'expires' => $time + intval($value['expires_in']) - 100];
@@ -179,7 +181,7 @@ final class Platform extends Library
      * @param string $AuthorizationCode
      * @param int $adminID
      * @return array|bool|mixed|string
-     * @throws \Exception
+     * @throws Exception
      */
     public function getAuthInfo(string $AuthorizationCode)
     {
@@ -431,7 +433,7 @@ final class Platform extends Library
      * 1，在第三方平台创建审核通过后，微信服务器会向其“授权事件接收URL”每隔10分钟定时推送verify_ticket。
      * 2，当公众号对第三方平台进行授权、取消授权、更新授权后，微信服务器会向第三方平台方的授权事件接收URL（创建第三方平台时填写）推送相关通知。
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
     public function acceptGrantEvent()
     {
@@ -527,11 +529,6 @@ final class Platform extends Library
             }
             return json_encode($content, 256);
         }
-
-        $content['time'] = time();
-        $content['url'] = _URL;
-        $content['ip'] = _CIP;
-        $content['agent'] = getenv('HTTP_USER_AGENT');
         $this->Temp->set($code, $content);
 
         return $content;
@@ -543,7 +540,6 @@ final class Platform extends Library
      * @param array $option
      * @param null $cert
      * @return array|mixed|string
-     * @throws \Exception
      */
     public function Request($url, $data = null, array $option = [], $cert = null)
     {
