@@ -136,7 +136,6 @@ final class Platform extends Library
      * 2、获取第三方平台.component_access_token
      * @param bool $byHash
      * @return mixed
-     * @throws Exception
      */
     public function PlatformAccessToken(bool $byHash = true)
     {
@@ -179,7 +178,6 @@ final class Platform extends Library
     /**
      * 4、使用授权码换取公众号或小程序的接口调用凭据和授权信息
      * @param string $AuthorizationCode
-     * @param int $adminID
      * @return array|bool|mixed|string
      * @throws Exception
      */
@@ -347,6 +345,8 @@ final class Platform extends Library
 
     /**
      * 7、获取授权方的选项设置信息
+     * @param $option
+     * @return array|mixed|string
      */
     public function getAppOption($option)
     {
@@ -359,9 +359,7 @@ final class Platform extends Library
         if (empty($option)) return "非法Option";
         $data['option_name'] = $option['key'];
 
-        $value = $this->Request($api, $data);
-
-        return $value;
+        return $this->Request($api, $data);
     }
 
     /**
@@ -380,6 +378,9 @@ final class Platform extends Library
 
     /**
      * 8、设置授权方的选项信息
+     * @param $option
+     * @param $value
+     * @return array|mixed|string
      */
     public function setAppOption($option, $value)
     {
@@ -516,7 +517,6 @@ final class Platform extends Library
      * 三方平台，受理微信跳回来的数据
      *
      * @return array|false|mixed|string|null
-     * @throws Exception
      */
     public function loadOpenID()
     {
