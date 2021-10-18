@@ -505,7 +505,7 @@ final class Platform extends Library
         $data = $_GET['data'] ?? '';
         $sign = $_GET['sign'] ?? '';
         if (empty($data) or empty($sign)) return '三方平台返回Data错误';
-        $array = json_decode(gzuncompress(base64_decode(urldecode($data))), true);
+        $array = json_decode(@gzuncompress(base64_decode(urldecode($data))), true);
         if (empty($array)) return '三方平台返回Data错误';
         $str = md5($array['appid'] . $data . 'OPENID');
         if ($str !== $sign) return '三方平台返回URL签名错误';
@@ -533,7 +533,9 @@ final class Platform extends Library
         $check = $this->Temp->get($code);
         if (is_array($check)) {
             $this->debug($check);
-            $this->redirect("{$array['back']}{$fh}{$array['key']}={$check['openid']}");
+            $openID = urlencode(base64_encode(gzcompress($check['openid'], 5)));
+            $sign = md5($array['key'] . '=' . $check['openid'] . 'OpenID' . date('Ymd'));
+            $this->redirect("{$array['back']}{$fh}{$array['key']}={$openID}&{$array['key']}sign={$sign}");
             return true;
         }
 
@@ -552,19 +554,20 @@ final class Platform extends Library
 
         $content = $this->Request("/sns/oauth2/component/access_token?{$args}");
         $this->debug($content);
-
         if (!is_array($content)) return $content;
+
         if (!isset($content['openid'])) {
             if (!$hasTry and isset($content['errmsg']) and strpos($content['errmsg'], 'access_token is invalid or not latest') > 0) {
                 $token = $this->PlatformAccessToken(false);
                 $hasTry = true;
                 goto tryGet;
             }
-            return json_encode($content, 256);
+            return json_encode($content, 320);
         }
         $this->Temp->set($code, $content);
-
-        $redirect = "{$array['back']}{$fh}{$array['key']}={$content['openid']}";
+        $openID = urlencode(base64_encode(gzcompress($content['openid'], 5)));
+        $sign = md5($array['key'] . '=' . $content['openid'] . 'OpenID' . date('Ymd'));
+        $redirect = "{$array['back']}{$fh}{$array['key']}={$openID}&{$array['key']}sign={$sign}";
         $this->redirect($redirect);
         return true;
     }

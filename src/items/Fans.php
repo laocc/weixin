@@ -120,7 +120,17 @@ final class Fans extends Base
         /**
          * 原始页面，获取到三方平台跳回来时所带的openID
          */
-        if (isset($_GET[$this->openIdKey])) return ['openid' => $_GET[$this->openIdKey]];
+        if (isset($_GET[$this->openIdKey])) {
+            $openID = @gzuncompress(base64_decode(urldecode($_GET[$this->openIdKey])));
+            if (!$openID) return 'fail uri';
+            $sign = md5($this->openIdKey . '=' . $openID . 'OpenID' . date('Ymd'));
+            $str = ($_GET["{$this->openIdKey}sign"] ?? 'e');
+            if ($sign !== $str) {
+                $sign = md5($this->openIdKey . '=' . $openID . 'OpenID' . date('Ymd', time() - 5));
+                if ($sign !== $str) return 'fail url';
+            }
+            return ['openid' => $openID];
+        }
 
         if (!isset($_GET['code']) or !isset($_GET['state'])) $this->redirectWeixin($option);
 
