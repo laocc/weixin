@@ -36,7 +36,8 @@ abstract class Base extends Library
         }
 
         if (empty($conf['appid'])) {
-            throw new \Error("wx conf 至少要含有appid:" . json_encode($data, 256 | 64));
+            $this->debug($data);
+            throw new \Error("wx conf 至少要含有appid");
         }
 
         $this->path = "/tmp/wx/{$conf['appid']}";

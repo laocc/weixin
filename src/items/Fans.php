@@ -84,15 +84,16 @@ final class Fans extends Base
                 'appid' => $this->AppID,
                 'pay' => $option['pay'] ?? 0,
                 'back' => $backUrl,
+                'key' => $this->openIdKey,
                 'time' => mt_rand(),
             ];
             $data = urlencode(base64_encode(json_encode($data, 320)));
             $sign = md5($this->AppID . $data . 'OPENID');
             //需在第三方平台所绑定的域名下实现下列URI，两个参数
-            /**
-             *
-             */
-            $param['redirect_uri'] = "{$this->Platform->PlatformURL}/user/openid/{$data}/{$sign}";
+            $platUri = rtrim($option['platform'] ?? '/fans/openid', '/');
+            $pam = ['data' => $data, 'sign' => $sign];
+            $fh = strpos($platUri, '?') ? '&' : '?';
+            $param['redirect_uri'] = "{$this->Platform->PlatformURL}{$platUri}{$fh}" . http_build_query($pam);
             $param['component_appid'] = $this->Platform->PlatformAppID;
         }
 
@@ -102,6 +103,8 @@ final class Fans extends Base
         $this->debug(['appURL' => $backUrl, 'redirectAPI' => $api, 'param' => $param]);
         $this->redirect($api);
     }
+
+    private $openIdKey = '_openid_';
 
     /**
      * @param array $option
@@ -116,33 +119,14 @@ final class Fans extends Base
      */
     public function load_OpenID(array $option = [])
     {
-        $openIdKey = '_openid_';
         /**
          * 原始页面，获取到三方平台跳回来时所带的openID
          */
-        if (isset($_GET[$openIdKey])) return ['openid' => $_GET['openid']];
+        if (isset($_GET[$this->openIdKey])) return ['openid' => $_GET[$this->openIdKey]];
 
         if (!isset($_GET['code']) or !isset($_GET['state'])) $this->redirectWeixin($option);
 
         if (!$this->sign_url($_GET['state'])) return "state与传入值不一致";
-
-        if ($this->Platform) {
-            //三方平台，受理微信跳回来的数据
-            $uri = parse_url(getenv('REQUEST_URI'), PHP_URL_PATH);
-            $uri = explode('/', $uri);
-            if (count($uri) < 3) return '三方平台回传URL错误';
-            $array = json_decode(base64_decode(urldecode($uri[1])));
-            if (empty($array)) return '三方平台返回Data错误';
-            $str = md5($array['appid'] . $uri[1] . 'OPENID');
-            if ($str !== $uri[2]) return '三方平台返回URL签名错误';
-
-            $platData = $this->Platform->loadOpenID();
-            $fh = strpos($platData['back'], '?') ? '&' : '?';
-            $redirect = "{$platData['back']}{$fh}{$openIdKey}={$platData['openid']}";
-            //跳回原始页面
-            $this->redirect($redirect);
-            exit;
-        }
 
         //直连微信公众号平台时，处理回传的数据
         $param = [];
@@ -160,16 +144,6 @@ final class Fans extends Base
          * 这时$content里已带有openid
          */
         return $content;
-    }
-
-    private function redirect(string $redirect)
-    {
-        header('Expires: ' . gmdate('D, d M Y H:i:s', time() - 1) . ' GMT');
-        header("Cache-Control: no-cache");
-        header("Pragma: no-cache");
-        header("Location: {$redirect}");
-        fastcgi_finish_request();
-        exit;
     }
 
     /**

@@ -493,9 +493,36 @@ final class Platform extends Library
         return $this->_redis->publish('order', $action, ['_action' => $action] + $value);
     }
 
+    /**
+     * @return string
+     *
+     * 这里的数据是Fans中组合的，签名规则也是在Fans()->redirectWeixin()中创建的
+     *
+     */
+    private function checkData()
+    {
+        $data = $_GET['data'] ?? '';
+        $sign = $_GET['sign'] ?? '';
+        $array = json_decode(base64_decode(urldecode($data)));
+        if (empty($array)) return '三方平台返回Data错误';
+        $str = md5($array['appid'] . $data . 'OPENID');
+        if ($str !== $sign) return '三方平台返回URL签名错误';
+
+        return $array;
+    }
+
+    /**
+     * 三方平台，受理微信跳回来的数据
+     *
+     * @return array|false|mixed|string|null
+     * @throws Exception
+     */
     public function loadOpenID()
     {
         if (!isset($_GET['code'])) return null;
+
+        $array = $this->checkData();
+        if (is_string($array)) return $array;
 
         $code = $_GET['code'];
 
@@ -531,7 +558,9 @@ final class Platform extends Library
         }
         $this->Temp->set($code, $content);
 
-        return $content;
+        $fh = strpos($array['back'], '?') ? '&' : '?';
+        $redirect = "{$array['back']}{$fh}{$array['key']}={$array['openid']}";
+        $this->redirect($redirect);
     }
 
     /**
