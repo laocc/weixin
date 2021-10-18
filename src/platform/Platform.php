@@ -524,6 +524,7 @@ final class Platform extends Library
 
         $array = $this->checkData();
         if (is_string($array)) return $array;
+        $this->debug($array);
 
         $code = $_GET['code'];
 
