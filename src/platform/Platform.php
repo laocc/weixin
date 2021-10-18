@@ -525,6 +525,7 @@ final class Platform extends Library
         $array = $this->checkData();
         if (is_string($array)) return $array;
         $this->debug($array);
+        $fh = strpos($array['back'], '?') ? '&' : '?';
 
         $code = $_GET['code'];
 
@@ -532,7 +533,8 @@ final class Platform extends Library
         $check = $this->Temp->get($code);
         if (is_array($check)) {
             $this->debug($check);
-            return $check;
+            $this->redirect("{$array['back']}{$fh}{$array['key']}={$check['openid']}");
+            return true;
         }
 
         $token = $this->PlatformAccessToken();
@@ -549,6 +551,8 @@ final class Platform extends Library
         $args = http_build_query($param);
 
         $content = $this->Request("/sns/oauth2/component/access_token?{$args}");
+        $this->debug($content);
+
         if (!is_array($content)) return $content;
         if (!isset($content['openid'])) {
             if (!$hasTry and isset($content['errmsg']) and strpos($content['errmsg'], 'access_token is invalid or not latest') > 0) {
@@ -560,9 +564,9 @@ final class Platform extends Library
         }
         $this->Temp->set($code, $content);
 
-        $fh = strpos($array['back'], '?') ? '&' : '?';
-        $redirect = "{$array['back']}{$fh}{$array['key']}={$array['openid']}";
+        $redirect = "{$array['back']}{$fh}{$array['key']}={$content['openid']}";
         $this->redirect($redirect);
+        return true;
     }
 
     /**
