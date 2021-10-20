@@ -2,7 +2,7 @@
 
 namespace esp\weiXin\items;
 
-use esp\library\request\Get;
+use esp\helper\library\request\Get;
 use esp\weiXin\Base;
 
 final class Reply extends Base

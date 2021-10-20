@@ -5,7 +5,7 @@ namespace esp\weiXin;
 use esp\core\Library;
 use esp\http\Http;
 use esp\http\HttpResult;
-use esp\library\ext\Xml;
+use esp\helper\library\ext\Xml;
 use esp\weiXin\platform\Platform;
 
 abstract class Base extends Library
