@@ -31,7 +31,7 @@ final class Platform extends Library
         $this->PlatformAppSecret = $open['secret'];
         $this->PlatformURL = $open['host'];
 
-        $conf = $this->_config->get('database.redis');
+        $conf = $this->_controller->_config->get('database.redis');
         $redis = new Redis($conf);
 
         $this->Hash = $redis->hash("PLAT_{$open['appid']}");  //整理时可以删除
