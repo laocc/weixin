@@ -476,7 +476,7 @@ final class Platform extends Library
                 ]);
 
                 if ($data['InfoType'] === 'authorized') {
-                    $this->_redis->publish('order', 'asyncMpp', ['_action' => 'asyncMpp', 'mppAppID' => $this->AppID]);
+                    $this->_controller->_config->_Redis->publish('order', 'asyncMpp', ['_action' => 'asyncMpp', 'mppAppID' => $this->AppID]);
                 }
 
                 break;
@@ -491,7 +491,7 @@ final class Platform extends Library
 
     final protected function task(string $action, $value)
     {
-        return $this->_redis->publish('order', $action, ['_action' => $action] + $value);
+        return $this->_controller->_config->_Redis->publish('order', $action, ['_action' => $action] + $value);
     }
 
     /**
