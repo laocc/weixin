@@ -17,6 +17,7 @@ abstract class Base extends Library
     protected $debug;
 
     private $path;
+    private $_Hash;
 
     public $host = 'https://api.weixin.qq.com';
     public $mpp;
@@ -40,10 +41,9 @@ abstract class Base extends Library
             throw new \Error("wx conf 至少要含有appid");
         }
 
-        $this->path = "/tmp/wx/{$conf['appid']}";
-        if (!is_dir($this->path)) mkdir($this->path, 0744, true);
         $this->conf = $conf;
         $this->AppID = $conf['appid'];
+        $this->_Hash = $this->Hash("aloneMPP");  //整理时可以删除
 
         if (isset($conf['platform_config'])) {
             $this->Platform = new Platform($conf['platform_config'], $this->AppID);
@@ -74,8 +74,6 @@ abstract class Base extends Library
         $this->AppID = $conf['appid'];
         $this->conf = ['appid' => $conf['appid'], 'secret' => $conf['secret']];
 
-        $this->path = "/tmp/wx/{$this->AppID}";
-        if (!is_dir($this->path)) mkdir($this->path, 0740, true);
 
         return $this;
     }
@@ -94,11 +92,9 @@ abstract class Base extends Library
     protected function tempCache(string $name, $value = null)
     {
         if (is_null($value)) {
-            if (!is_readable("{$this->path}/{$name}")) return null;
-            $txt = file_get_contents("{$this->path}/{$name}");
-            return unserialize($txt);
+            return $this->_Hash->get($name);
         }
-        return file_put_contents("{$this->path}/{$name}", serialize($value)) > 0;
+        return $this->_Hash->set($name, $value);
     }
 
 
