@@ -20,8 +20,8 @@ final class Platform extends Library
     public $PlatformURL;
     private $PlatformAppSecret;
 
-    private $Hash;
-    private $Temp;
+    private $_Hash;
+    private $_Temp;
 
     public function _init(array $open, string $AppID = '')
     {
@@ -33,10 +33,11 @@ final class Platform extends Library
 
 //        $conf = $this->_controller->_config->get('database.redis');
 //        $redis = new Redis($conf);
+//        $redis = &$this->_controller->_config->_Redis;
+//        $this->Hash = $redis->hash("PLAT_{$open['appid']}");  //整理时可以删除
+//        $this->Temp = $redis->hash("Temp_" . date('Ymd'));      //第二天后可以删除
 
-        $redis = &$this->_controller->_config->_Redis;
-        $this->Hash = $redis->hash("PLAT_{$open['appid']}");  //整理时可以删除
-        $this->Temp = $redis->hash("Temp_" . date('Ymd'));      //第二天后可以删除
+        $this->_Hash = $this->Hash("PLAT_{$open['appid']}");  //整理时可以删除
 
         $this->AppID = $AppID;  //公众号的APPID
     }
@@ -56,11 +57,11 @@ final class Platform extends Library
     public function token(string $name, $value = null)
     {
         if (is_null($value)) {
-            $val = $this->Hash->get("{$name}_{$this->AppID}");
+            $val = $this->_Hash->get("{$name}_{$this->AppID}");
             if ($val) return $val;
             return null;
         }
-        return $this->Hash->set("{$name}_{$this->AppID}", $value);
+        return $this->_Hash->set("{$name}_{$this->AppID}", $value);
     }
 
     public function Open()
@@ -94,7 +95,7 @@ final class Platform extends Library
 
         //预授权码有效期为10分钟
         $code = ['code' => $value['pre_auth_code'], 'adminID' => $adminID];
-        $this->Temp->set(md5($value['pre_auth_code']), $code);
+        $this->_Hash->set(md5($value['pre_auth_code']), $code);
 
         $back = urlencode(sprintf("%s/mpp/access/%s/%s/", $this->PlatformURL, $this->PlatformAppID, $adminID));
         $url = "https://mp.weixin.qq.com/safe/bindcomponent?action=bindcomponent&auth_type=%s&no_scan=1&component_appid=%s&pre_auth_code=%s&redirect_uri=%s#wechat_redirect";
@@ -141,17 +142,17 @@ final class Platform extends Library
     public function PlatformAccessToken(bool $byHash = true)
     {
         $time = time();
-        $token = $this->Hash->get("Access_Token");
+        $token = $this->_Hash->get("Access_Token");
         if ($byHash and is_array($token)) {
             if (intval($token['expires'] ?? 0) > $time) return $token['token'];
         }
 
-        $Ticket = $this->Hash->get('Verify_Ticket');
+        $Ticket = $this->_Hash->get('Verify_Ticket');
         if (empty($Ticket)) {
             $fil = _RUNTIME . "/Verify_Ticket_{$this->PlatformAppID}";
             if (is_file($fil)) {
                 $Ticket = file_get_contents($fil);
-                $this->Hash->set('Verify_Ticket', $Ticket);
+                $this->_Hash->set('Verify_Ticket', $Ticket);
             } else {
                 throw new Exception("{$this->PlatformAppID} Verify_Ticket 丢失");
             }
@@ -171,7 +172,7 @@ final class Platform extends Library
         }
 
         $code = ['token' => $value['component_access_token'], 'time' => date('Y-m-d H:i:s', $time), 'expires' => $time + intval($value['expires_in']) - 100];
-        $this->Hash->set("Access_Token", $code);
+        $this->_Hash->set("Access_Token", $code);
         return $code['token'];
     }
 
@@ -458,7 +459,7 @@ final class Platform extends Library
 
         switch ($data['InfoType']) {
             case 'component_verify_ticket'://1、推送verify_ticket协议
-                $this->Hash->set('Verify_Ticket', $data['ComponentVerifyTicket']);
+                $this->_Hash->set('Verify_Ticket', $data['ComponentVerifyTicket']);
                 file_put_contents(_RUNTIME . "/Verify_Ticket_{$data['AppId']}", $data['ComponentVerifyTicket']);
                 break;
 
@@ -466,7 +467,7 @@ final class Platform extends Library
             case 'updateauthorized'://授权更新通知
 
                 $this->AppID = $data['AuthorizerAppid'];
-                $code = $this->Temp->get(md5($data['PreAuthCode']));
+                $code = $this->_Hash->get(md5($data['PreAuthCode']));
                 if (empty($code)) break;
 
                 $this->AppAdminID = intval($code['adminID'] ?? 0);
@@ -531,7 +532,7 @@ final class Platform extends Library
         $code = $_GET['code'];
 
         //若最近缓存过，直接返回
-        $check = $this->Temp->get($code);
+        $check = $this->_Hash->get($code);
         if (is_array($check)) {
             $this->debug($check);
             $openID = urlencode(base64_encode(gzcompress($check['openid'], 5)));
@@ -565,7 +566,7 @@ final class Platform extends Library
             }
             return json_encode($content, 320);
         }
-        $this->Temp->set($code, $content);
+        $this->_Hash->set($code, $content);
         $openID = urlencode(base64_encode(gzcompress($content['openid'], 5)));
         $sign = md5($array['key'] . '=' . $content['openid'] . 'OpenID' . date('Ymd'));
         $redirect = "{$array['back']}{$fh}{$array['key']}={$openID}&{$array['key']}sign={$sign}";
