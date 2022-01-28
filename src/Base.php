@@ -45,8 +45,11 @@ abstract class Base extends Library
         $this->conf = $conf;
         $this->AppID = $conf['appid'];
 
-        if (isset($conf['platform'])) $this->Platform = $conf['platform'];
-        unset($conf['platform']);
+        if (isset($conf['platform_config'])) {
+            $this->Platform = new Platform($conf['platform_config'], $this->AppID);
+        }
+//        if (isset($conf['platform'])) $this->Platform = $conf['platform'];
+        unset($conf['platform_config']);
         if (isset($data['mppAppID'])) $this->mpp = $conf;
     }
 
