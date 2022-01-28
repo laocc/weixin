@@ -47,9 +47,12 @@ abstract class Base extends Library
 
         if (isset($conf['platform_config'])) {
             $this->Platform = new Platform($conf['platform_config'], $this->AppID);
+            unset($conf['platform_config']);
+        } else if (isset($data['mppOpenKey']) and $data['mppOpenKey'] !== 'alone') {
+            $open = $this->config("open.{$data['mppOpenKey']}");
+            $this->Platform = new Platform($open, $this->AppID);
         }
-//        if (isset($conf['platform'])) $this->Platform = $conf['platform'];
-        unset($conf['platform_config']);
+
         if (isset($data['mppAppID'])) $this->mpp = $conf;
     }
 
