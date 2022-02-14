@@ -2,6 +2,7 @@
 
 namespace esp\weiXin\platform;
 
+use esp\core\db\ext\RedisHash;
 use esp\core\db\Redis;
 use esp\core\Library;
 use esp\http\Http;
@@ -20,8 +21,10 @@ final class Platform extends Library
     public $PlatformURL;
     private $PlatformAppSecret;
 
+    /**
+     * @var $_Hash RedisHash
+     */
     private $_Hash;
-    private $_Temp;
 
     public function _init(array $open, string $AppID = '')
     {
@@ -30,15 +33,7 @@ final class Platform extends Library
         $this->PlatformEncodingAESKey = $open['aeskey'];
         $this->PlatformAppSecret = $open['secret'];
         $this->PlatformURL = $open['host'];
-
-//        $conf = $this->_controller->_config->get('database.redis');
-//        $redis = new Redis($conf);
-//        $redis = &$this->_controller->_config->_Redis;
-//        $this->Hash = $redis->hash("PLAT_{$open['appid']}");  //整理时可以删除
-//        $this->Temp = $redis->hash("Temp_" . date('Ymd'));      //第二天后可以删除
-
         $this->_Hash = $this->Hash("PLAT_{$open['appid']}");  //整理时可以删除
-
         $this->AppID = $AppID;  //公众号的APPID
     }
 
@@ -82,12 +77,11 @@ final class Platform extends Library
      * 1，手机跳入/mpp/accessGet($openAppID, $mppID)，这里的$mppID暂时没有用
      * 2，后台通知到/mpp/openPost，即本类->acceptGrantEvent
      *
-     * @param $adminID
-     * @param $type
-     * @return array|string
-     * @throws Exception
+     * @param int $adminID
+     * @param int $type
+     * @return string
      */
-    public function CreateAccessGrantCode(int $adminID, int $type = 1)
+    public function CreateAccessGrantCode(int $adminID, int $type = 1): string
     {
         $data = ['component_appid' => $this->PlatformAppID];
         $api = '/cgi-bin/component/api_create_preauthcode?component_access_token={component_access_token}';
@@ -115,7 +109,7 @@ final class Platform extends Library
      * @param $express
      * @return array
      */
-    public function accessGrant($code, $express)
+    public function accessGrant($code, $express): array
     {
         //有效期为1小时
         $auth = [

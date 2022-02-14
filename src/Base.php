@@ -2,6 +2,7 @@
 
 namespace esp\weiXin;
 
+use esp\core\db\ext\RedisHash;
 use esp\core\Library;
 use esp\http\Http;
 use esp\http\HttpResult;
@@ -17,7 +18,10 @@ abstract class Base extends Library
     protected $debug;
 
     private $path;
-    private $_Hash;
+    /**
+     * @var $_Hash RedisHash
+     */
+    protected $_Hash;
 
     public $host = 'https://api.weixin.qq.com';
     public $mpp;
@@ -58,9 +62,9 @@ abstract class Base extends Library
 
     /**
      * 切换网站
+     *
      * @param array $mpp
      * @return $this
-     * @throws \Exception
      */
     public function changeMpp(array $mpp)
     {
@@ -73,30 +77,8 @@ abstract class Base extends Library
         $this->mpp = $conf;
         $this->AppID = $conf['appid'];
         $this->conf = ['appid' => $conf['appid'], 'secret' => $conf['secret']];
-
-
         return $this;
     }
-
-
-    /**
-     * @param string $name
-     * @param null $value
-     * @return array|int|string
-     *
-     * 目前只用于存储：
-     * Access_Token：自主接入时，此值为单独获取，如果是授权接入，则由platform读取
-     * ApiTicket：
-     *
-     */
-    protected function tempCache(string $name, $value = null)
-    {
-        if (is_null($value)) {
-            return $this->_Hash->get($name);
-        }
-        return $this->_Hash->set($name, $value);
-    }
-
 
     /**
      * @param array $xml
@@ -224,7 +206,7 @@ abstract class Base extends Library
      */
     public function load_AccessToken()
     {
-        $token = $this->tempCache("Access_Token_{$this->AppID}");
+        $token = $this->_Hash->get("Access_Token_{$this->AppID}");
         if ($token and $token['expires'] > time()) return $token;
 
         $api = sprintf("/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s",
@@ -233,7 +215,7 @@ abstract class Base extends Library
         if (is_string($dat)) return $dat;
 
         $val = ['token' => $dat['access_token'], 'expires' => intval($dat['expires_in']) + time() - 100];
-        $this->tempCache("Access_Token_{$this->AppID}", $val);
+        $this->_Hash->set("Access_Token_{$this->AppID}", $val);
 
         return $val;
     }
