@@ -224,7 +224,7 @@ abstract class Base extends Library
      */
     public function load_AccessToken()
     {
-        $token = $this->tempCache('Access_Token_V');
+        $token = $this->tempCache("Access_Token_{$this->AppID}");
         if ($token and $token['expires'] > time()) return $token;
 
         $api = sprintf("/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s",
@@ -233,7 +233,7 @@ abstract class Base extends Library
         if (is_string($dat)) return $dat;
 
         $val = ['token' => $dat['access_token'], 'expires' => intval($dat['expires_in']) + time() - 100];
-        $this->tempCache('Access_Token_V', $val);
+        $this->tempCache("Access_Token_{$this->AppID}", $val);
 
         return $val;
     }

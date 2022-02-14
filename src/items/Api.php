@@ -14,7 +14,7 @@ final class Api extends Base
      */
     private function load_ApiTicket()
     {
-        $ticket = $this->tempCache('ApiTicket');
+        $ticket = $this->tempCache("ApiTicket_{$this->AppID}");
         if ($ticket and $ticket['expires'] > time()) return $ticket;
 
         $api = "/cgi-bin/ticket/getticket?type=jsapi&access_token={access_token}";
@@ -23,7 +23,7 @@ final class Api extends Base
 
         $dat = ['ticket' => $dat['ticket'], 'expires' => intval($dat['expires_in']) + time() - 100];
 
-        $this->tempCache('ApiTicket', $dat);
+        $this->tempCache("ApiTicket_{$this->AppID}", $dat);
         return $dat;
     }
 
