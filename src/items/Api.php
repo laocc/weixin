@@ -2,8 +2,9 @@
 
 namespace esp\weiXin\items;
 
-
 use esp\weiXin\Base;
+use Exception;
+use function esp\helper\str_rand;
 
 final class Api extends Base
 {
@@ -11,6 +12,7 @@ final class Api extends Base
     /**
      * 获取jsapi_ticket
      * @return array|int|string
+     * @throws Exception
      */
     private function load_ApiTicket()
     {
@@ -31,12 +33,14 @@ final class Api extends Base
     /**
      *  生成微信JS-SDK的config
      *
-     * @param string $url
-     * @param bool $debug
-     * @return array|string
-     *
      * 调用接口，请参考
      * https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#63
+     *
+     * @param string $url
+     * @param array $api
+     * @param bool $debug
+     * @return array|string
+     * @throws Exception
      */
     public function ApiTicketJS(string $url, array $api = [], bool $debug = false)
     {
@@ -48,7 +52,7 @@ final class Api extends Base
         if (is_string($ticket)) return $ticket;
 
         $arrValue = array();
-        $arrValue['noncestr'] = \esp\helper\str_rand(30);
+        $arrValue['noncestr'] = str_rand(30);
         $arrValue['timestamp'] = time();
         $arrValue['jsapi_ticket'] = $ticket['ticket'];
         $arrValue['url'] = $url;

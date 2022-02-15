@@ -3,7 +3,6 @@
 namespace esp\weiXin\platform;
 
 use esp\core\db\ext\RedisHash;
-use esp\core\db\Redis;
 use esp\core\Library;
 use esp\http\Http;
 use esp\weiXin\auth\Crypt;
@@ -11,7 +10,8 @@ use Exception;
 
 final class Platform extends Library
 {
-    private $api = 'https://api.weixin.qq.com';
+    const wxApi = 'https://api.weixin.qq.com';
+
     public $AppID;
     public $AppAdminID;
 
@@ -33,8 +33,8 @@ final class Platform extends Library
         $this->PlatformEncodingAESKey = $open['aeskey'];
         $this->PlatformAppSecret = $open['secret'];
         $this->PlatformURL = $open['host'];
-        $this->_Hash = $this->Hash("PLAT_{$open['appid']}");  //整理时可以删除
         $this->AppID = $AppID;  //公众号的APPID
+        $this->_Hash = $this->Hash("PLAT_{$open['appid']}");  //整理时可以删除
     }
 
     /**
@@ -594,7 +594,7 @@ final class Platform extends Library
             if (!$token) return 'empty AccessToken';
             $api = str_replace('{authorizer_access_token}', $token['token'], $api);
         }
-        if ($api[0] !== 'h') $api = "{$this->api}{$api}";
+        if ($api[0] === '/') $api = $this::wxApi . $api;
 
         $postVal = (new Http($option))->data($data)->post($api);
         $this->debug($postVal);

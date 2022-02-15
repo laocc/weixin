@@ -55,8 +55,7 @@ final class Mpp extends Base
         }
 
         $api = "/cgi-bin/qrcode/create?access_token={access_token}";
-        $JsonStr = $this->Request($api, $data);
-        return $JsonStr;
+        return $this->Request($api, $data);
     }
 
 

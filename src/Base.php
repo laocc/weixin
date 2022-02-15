@@ -4,34 +4,37 @@ namespace esp\weiXin;
 
 use esp\core\db\ext\RedisHash;
 use esp\core\Library;
+use esp\helper\library\Error;
 use esp\http\Http;
 use esp\http\HttpResult;
 use esp\helper\library\ext\Xml;
 use esp\weiXin\platform\Platform;
+use Exception;
 
 abstract class Base extends Library
 {
-    protected $conf;
-    protected $AppID;
-    protected $Hash;
-    protected $redis;
-    protected $debug;
+    const wxApi = 'https://api.weixin.qq.com';
 
-    private $path;
+    protected $AppID;
+    protected $mpp;
+    protected $openID;
+    protected $nick;
+
+    /**
+     * @var $Platform Platform
+     */
+    protected $Platform;
+
     /**
      * @var $_Hash RedisHash
      */
     protected $_Hash;
 
-    public $host = 'https://api.weixin.qq.com';
-    public $mpp;
-    public $openID;
-    public $nick;
-    /**
-     * @var $Platform Platform
-     */
-    public $Platform;
 
+    /**
+     * @param array $data
+     * @throws Error
+     */
     public function _init(array $data)
     {
         $conf = [];
@@ -40,13 +43,18 @@ abstract class Base extends Library
             $conf[strtolower($k)] = $v;
         }
 
-        if (empty($conf['appid'])) {
+        if (!isset($conf['appid']) or empty($conf['appid'])) {
             $this->debug($data);
             throw new \Error("wx conf 至少要含有appid");
         }
 
-        $this->conf = $conf;
-        $this->AppID = $conf['appid'];
+        if (!isset($conf['secret']) or empty($conf['secret'])) {
+            $this->debug($data);
+            throw new \Error("wx conf 至少要含有secret");
+        }
+
+        $this->mpp = $conf;
+        $this->AppID = $conf['appid'];//当前公众号或小程序的appid
         $this->_Hash = $this->Hash("aloneMPP");  //整理时可以删除
 
         if (isset($conf['platform_config'])) {
@@ -56,8 +64,6 @@ abstract class Base extends Library
             $open = $this->config("open.{$data['mppOpenKey']}");
             $this->Platform = new Platform($open, $this->AppID);
         }
-
-        if (isset($data['mppAppID'])) $this->mpp = $conf;
     }
 
     /**
@@ -76,7 +82,6 @@ abstract class Base extends Library
 
         $this->mpp = $conf;
         $this->AppID = $conf['appid'];
-        $this->conf = ['appid' => $conf['appid'], 'secret' => $conf['secret']];
         return $this;
     }
 
@@ -84,9 +89,9 @@ abstract class Base extends Library
      * @param array $xml
      * @param null $notes
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
-    final public function xml(array $xml, $notes = null)
+    public function xml(array $xml, $notes = null)
     {
         return (new Xml($xml, $notes ?: 'xml'))->render(false);
     }
@@ -97,8 +102,9 @@ abstract class Base extends Library
      * @param array $option
      * @param null $cert
      * @return array|HttpResult|mixed|null|string
+     * @throws Exception
      */
-    final public function Request(string $url, $data = null, array $option = [], $cert = null)
+    public function Request(string $url, $data = null, array $option = [], $cert = null)
     {
         if (empty($url)) return 'empty API';
         if ($data and !isset($option['type'])) $option['type'] = 'post';
@@ -119,7 +125,7 @@ abstract class Base extends Library
             if (is_string($token)) return $token;
             $api = str_replace('{access_token}', $token['token'], $api);
         }
-        if ($api[0] !== 'h') $api = "{$this->host}{$api}";
+        if ($api[0] === '/') $api = $this::wxApi . $api;
 
         $request = (new Http($option))->data($data)->request($api);
 
@@ -157,9 +163,9 @@ abstract class Base extends Library
      * @return array|mixed|string,
      * array：原样返回，
      * string：具体错误
-     * @throws \Exception
+     * @throws Exception
      */
-    final protected function checkError(array $inArr, array $allowCode = [])
+    protected function checkError(array $inArr, array $allowCode = [])
     {
         if (isset($inArr["error"]) && $inArr["error"]) return $inArr['message'];
         if (!isset($inArr["errcode"])) return true;
@@ -203,14 +209,14 @@ abstract class Base extends Library
      * 下载AccessToken
      * https://mp.weixin.qq.com/wiki/11/0e4b294685f817b95cbed85ba5e82b8f.html
      * @return array|string
+     * @throws Exception
      */
     public function load_AccessToken()
     {
         $token = $this->_Hash->get("Access_Token_{$this->AppID}");
         if ($token and $token['expires'] > time()) return $token;
 
-        $api = sprintf("/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s",
-            $this->conf['appid'], $this->conf['secret']);
+        $api = sprintf("/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", $this->mpp['appid'], $this->mpp['secret']);
         $dat = $this->Request($api);
         if (is_string($dat)) return $dat;
 
@@ -234,7 +240,7 @@ abstract class Base extends Library
      * https://mp.weixin.qq.com/wiki/0/2ad4b6bfd29f30f71d39616c2a0fcedc.html
      * @param array $hack
      * @param bool $isHack
-     * @throws \Exception
+     * @throws Exception
      */
     public function load_CallBackIP($hack = [], $isHack = false)
     {
@@ -255,7 +261,7 @@ abstract class Base extends Library
      * http://mp.weixin.qq.com/wiki/10/165c9b15eddcfbd8699ac12b0bd89ae6.html
      * @param $url
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
     public function load_ShortUrl($url)
     {
@@ -311,7 +317,7 @@ abstract class Base extends Library
      * @param Platform $plat
      * @return $this
      */
-    public function changePlat($plat)
+    public function changePlat(Platform $plat)
     {
         $this->Platform = $plat;
         return $this;
