@@ -48,11 +48,6 @@ abstract class Base extends Library
             throw new \Error("wx conf 至少要含有appid");
         }
 
-        if (!isset($conf['secret']) or empty($conf['secret'])) {
-            $this->debug($data);
-            throw new \Error("wx conf 至少要含有secret");
-        }
-
         $this->mpp = $conf;
         $this->AppID = $conf['appid'];//当前公众号或小程序的appid
         $this->_Hash = $this->Hash("aloneMPP");  //整理时可以删除
@@ -60,9 +55,14 @@ abstract class Base extends Library
         if (isset($conf['platform_config'])) {
             $this->Platform = new Platform($conf['platform_config'], $this->AppID);
             unset($conf['platform_config']);
+
         } else if (isset($data['mppOpenKey']) and $data['mppOpenKey'] !== 'alone') {
             $open = $this->config("open.{$data['mppOpenKey']}");
             $this->Platform = new Platform($open, $this->AppID);
+
+        } else if (!isset($conf['secret']) or empty($conf['secret'])) {
+            $this->debug($data);
+            throw new \Error("wx conf 自主接入的应用至少要含有secret");
         }
     }
 
@@ -82,6 +82,36 @@ abstract class Base extends Library
 
         $this->mpp = $conf;
         $this->AppID = $conf['appid'];
+        return $this;
+    }
+
+
+    /**
+     * @param Platform $plat
+     * @return $this
+     */
+    public function changePlat(Platform $plat)
+    {
+        $this->Platform = $plat;
+        return $this;
+    }
+
+    public function setFans(string $openID, string $nick)
+    {
+        $this->openID = $openID;
+        $this->nick = $nick;
+        return $this;
+    }
+
+    public function setOpenID(string $OpenID)
+    {
+        $this->openID = $OpenID;
+        return $this;
+    }
+
+    public function setNick(string $nick)
+    {
+        $this->nick = $nick;
         return $this;
     }
 
@@ -310,37 +340,6 @@ abstract class Base extends Library
     public function mppAuth(array $Disable)
     {
         return in_array($this->mpp['type'], $Disable) ? '公众号没有此接口权限' : false;
-    }
-
-
-    /**
-     * @param Platform $plat
-     * @return $this
-     */
-    public function changePlat(Platform $plat)
-    {
-        $this->Platform = $plat;
-        return $this;
-    }
-
-
-    public function setFans(string $openID, string $nick)
-    {
-        $this->openID = $openID;
-        $this->nick = $nick;
-        return $this;
-    }
-
-    public function setOpenID(string $OpenID)
-    {
-        $this->openID = $OpenID;
-        return $this;
-    }
-
-    public function setNick(string $nick)
-    {
-        $this->nick = $nick;
-        return $this;
     }
 
     //向管理员报警
