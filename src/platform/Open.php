@@ -3,6 +3,10 @@
 namespace esp\weiXin\platform;
 
 
+/**
+ * Class Open
+ * @package esp\weiXin\platform
+ */
 class Open
 {
     private $platform;

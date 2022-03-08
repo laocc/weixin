@@ -2,17 +2,17 @@
 
 namespace esp\weiXin\items;
 
+use esp\http\HttpResult;
 use esp\weiXin\Base;
+use Exception;
 
 final class Media extends Base
 {
 
-
     public function article($data)
     {
         $api = "/cgi-bin/material/add_news?access_token={access_token}";
-        $rest = $this->Request($api, $data);
-        return $rest;
+        return $this->Request($api, $data);
     }
 
 
@@ -20,16 +20,14 @@ final class Media extends Base
     {
         $api = "/cgi-bin/material/batchget_material?access_token={access_token}";
         $data = ['type' => $type, 'offset' => $index * 20, 'count' => 20];
-        $rest = $this->Request($api, $data);
-        return $rest;
+        return $this->Request($api, $data);
     }
 
 
     public function download(string $medIndex)
     {
         $api = "/cgi-bin/material/get_material?access_token={access_token}";
-        $rest = $this->Request($api, ['media_id' => $medIndex]);
-        return $rest;
+        return $this->Request($api, ['media_id' => $medIndex]);
     }
 
 
@@ -37,8 +35,8 @@ final class Media extends Base
      * @param string $type
      * @param string $file
      * @param array $info
-     * @return array|\esp\http\HttpResult|mixed|string
-     * @throws \Exception
+     * @return array|HttpResult|mixed|string|null
+     * @throws Exception
      */
     public function upload(string $type, string $file, array $info = [])
     {
@@ -69,8 +67,7 @@ final class Media extends Base
             $data['description'] = json_encode($data['description'], 256 | 64);
         }
 
-        $rest = $this->Request($api, $data, $option);
-        return $rest;
+        return $this->Request($api, $data, $option);
     }
 
     public function delete($mediaID)
