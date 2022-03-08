@@ -2,11 +2,10 @@
 
 namespace esp\weiXin\platform;
 
-use esp\core\db\ext\RedisHash;
-use esp\core\db\Redis;
 use esp\core\Library;
 use esp\http\Http;
 use esp\weiXin\auth\Crypt;
+use esp\weiXin\Hash;
 use Exception;
 
 final class Platform extends Library
@@ -22,7 +21,7 @@ final class Platform extends Library
     private $PlatformAppSecret;
 
     /**
-     * @var $_Hash RedisHash
+     * @var $_Hash Hash
      */
     private $_Hash;
 
@@ -33,8 +32,9 @@ final class Platform extends Library
         $this->PlatformEncodingAESKey = $open['aeskey'];
         $this->PlatformAppSecret = $open['secret'];
         $this->PlatformURL = $open['host'];
-        $this->_Hash = $this->Hash("PLAT_{$open['appid']}");  //整理时可以删除
         $this->AppID = $AppID;  //公众号的APPID
+
+        $this->_Hash = new Hash($this->_controller->_config->_Redis->redis, "PLAT_{$open['appid']}");
     }
 
     /**

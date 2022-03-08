@@ -2,7 +2,6 @@
 
 namespace esp\weiXin;
 
-use esp\core\db\ext\RedisHash;
 use esp\core\Library;
 use esp\http\Http;
 use esp\http\HttpResult;
@@ -17,9 +16,8 @@ abstract class Base extends Library
     protected $redis;
     protected $debug;
 
-    private $path;
     /**
-     * @var $_Hash RedisHash
+     * @var $_Hash Hash
      */
     protected $_Hash;
 
@@ -47,7 +45,7 @@ abstract class Base extends Library
 
         $this->conf = $conf;
         $this->AppID = $conf['appid'];
-        $this->_Hash = $this->Hash("aloneMPP");  //整理时可以删除
+        $this->_Hash = new Hash($this->_controller->_config->_Redis->redis, 'aloneMPP');
 
         if (isset($conf['platform_config'])) {
             $this->Platform = new Platform($conf['platform_config'], $this->AppID);
