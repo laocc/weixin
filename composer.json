@@ -1,6 +1,6 @@
 {
   "name": "laocc/weixin",
-  "description": "for weichat mp",
+  "description": "for weixin mp",
   "homepage": "https://github.com/laocc/weixin",
   "authors": [
     {
@@ -11,7 +11,7 @@
   "require": {
     "php": ">7.1",
     "laocc/http": "*",
-    "laocc/debug": "*"
+    "laocc/helper": "*"
   },
   "autoload": {
     "psr-4": {
