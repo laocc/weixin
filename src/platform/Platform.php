@@ -602,8 +602,7 @@ final class Platform extends Library
 
         $value = $postVal->data();
 
-        $prev = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
-        $this->debug(['api' => $api, 'data' => $data, 'value' => $value], $prev);
+        $this->debug(['api' => $api, 'data' => $data, 'value' => $value], 1);
 
         $check = $this->checkError($value, $option['allow'] ?? []);
         if ($check === 'try_once' and !$hasTry) {
