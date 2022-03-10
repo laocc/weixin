@@ -35,7 +35,7 @@ final class Platform extends Library
         $this->PlatformURL = $open['host'];
         $this->AppID = $AppID;  //公众号的APPID
 
-        $this->_Hash = new Hash($this->_controller->_config->_Redis->redis, "PLAT_{$open['appid']}");
+        $this->_Hash = new Hash($this->_controller->_config->_Redis, "PLAT_{$open['appid']}");
     }
 
     /**

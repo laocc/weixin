@@ -49,7 +49,7 @@ abstract class Base extends Library
 
         $this->mpp = $conf;
         $this->AppID = $conf['appid'];//当前公众号或小程序的appid
-        $this->_Hash = new Hash($this->_controller->_config->_Redis->redis, 'aloneMPP');
+        $this->_Hash = new Hash($this->_controller->_config->_Redis, 'aloneMPP');
 
         if (isset($conf['platform_config'])) {
             $this->Platform = new Platform($conf['platform_config'], $this->AppID);

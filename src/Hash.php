@@ -2,12 +2,14 @@
 
 namespace esp\weiXin;
 
+use Redis;
+
 class Hash
 {
     private $redis;
     private $key;
 
-    public function __construct(\Redis $redis, string $hashKey)
+    public function __construct(Redis $redis, string $hashKey)
     {
         $this->redis = $redis;
         $this->key = $hashKey;
