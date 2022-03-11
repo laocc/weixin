@@ -3,6 +3,7 @@
 namespace esp\weiXin;
 
 use esp\core\Library;
+use esp\dbs\redis\Redis;
 use esp\helper\library\Error;
 use esp\http\Http;
 use esp\http\HttpResult;
@@ -49,7 +50,6 @@ abstract class Base extends Library
 
         $this->mpp = $conf;
         $this->AppID = $conf['appid'];//当前公众号或小程序的appid
-        $this->_Hash = new Hash($this->_controller->_config->_Redis, 'aloneMPP');
 
         if (isset($conf['platform_config'])) {
             $this->Platform = new Platform($conf['platform_config'], $this->AppID);
@@ -62,6 +62,17 @@ abstract class Base extends Library
         } else if (!isset($conf['secret']) or empty($conf['secret'])) {
             $this->debug($data);
             throw new \Error("wx conf 自主接入的应用至少要含有secret");
+        }
+    }
+
+    protected function Hash()
+    {
+        if (_CLI) {
+            $conf = $this->config('database.redis');
+            $rds = new Redis($conf);
+            return new Hash($rds->redis, 'aloneMPP');
+        } else {
+            return new Hash($this->_controller->_redis, 'aloneMPP');
         }
     }
 
@@ -242,7 +253,7 @@ abstract class Base extends Library
      */
     public function load_AccessToken()
     {
-        $token = $this->_Hash->get("Access_Token_{$this->AppID}");
+        $token = $this->Hash()->get("Access_Token_{$this->AppID}");
         if ($token and $token['expires'] > time()) return $token;
 
         $api = sprintf("/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", $this->mpp['appid'], $this->mpp['secret']);
@@ -250,7 +261,7 @@ abstract class Base extends Library
         if (is_string($dat)) return $dat;
 
         $val = ['token' => $dat['access_token'], 'expires' => intval($dat['expires_in']) + time() - 100];
-        $this->_Hash->set("Access_Token_{$this->AppID}", $val);
+        $this->Hash()->set("Access_Token_{$this->AppID}", $val);
 
         return $val;
     }

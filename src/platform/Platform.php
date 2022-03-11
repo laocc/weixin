@@ -3,6 +3,7 @@
 namespace esp\weiXin\platform;
 
 use esp\core\Library;
+use esp\dbs\redis\Redis;
 use esp\http\Http;
 use esp\weiXin\auth\Crypt;
 use esp\weiXin\Hash;
@@ -35,7 +36,14 @@ final class Platform extends Library
         $this->PlatformURL = $open['host'];
         $this->AppID = $AppID;  //公众号的APPID
 
-        $this->_Hash = new Hash($this->_controller->_config->_Redis, "PLAT_{$open['appid']}");
+        if (_CLI) {
+            $conf = $this->config('database.redis');
+            $rds = new Redis($conf);
+            $this->_Hash = new Hash($rds->redis, "PLAT_{$this->PlatformAppID}");
+        } else {
+            $this->_Hash = new Hash($this->_controller->_redis, "PLAT_{$this->PlatformAppID}");
+        }
+
     }
 
     /**
@@ -473,7 +481,7 @@ final class Platform extends Library
                 ]);
 
                 if ($data['InfoType'] === 'authorized') {
-                    $this->_controller->_config->_Redis->publish('order', 'asyncMpp', ['_action' => 'asyncMpp', 'mppAppID' => $this->AppID]);
+                    $this->_controller->publish('asyncMpp', ['_action' => 'asyncMpp', 'mppAppID' => $this->AppID]);
                 }
 
                 break;
@@ -484,11 +492,6 @@ final class Platform extends Library
         }
 
         return $data['InfoType'];
-    }
-
-    final protected function task(string $action, $value)
-    {
-        return $this->_controller->_config->_Redis->publish('order', $action, ['_action' => $action] + $value);
     }
 
     /**
