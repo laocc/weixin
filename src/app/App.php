@@ -2,11 +2,56 @@
 
 namespace esp\weiXin\app;
 
-use function esp\helper\mk_dir;
 use esp\weiXin\Base;
+use function esp\helper\mk_dir;
 
 class App extends Base
 {
+
+
+    /**
+     * 读取风险等级，调用此接口必须在用户访问小程序的2小时内进行
+     *
+     * https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/safety-control-capability/riskControl.getUserRiskRank.html
+     *
+     * @param array $param
+     * @return array
+     */
+    public function readRiskRank(array $param): array
+    {
+        $api = "/wxa/getuserriskrank?access_token={access_token}";
+        $scene = $param['scene'] ?? [0, 1];
+        if (is_int($scene)) $scene = [$scene];
+
+        $post = [];
+        $post['appid'] = $this->AppID;
+        $post['openid'] = $param['openid'];
+        $post['client_ip'] = $param['ip'];
+        if (isset($param['mobile'])) $post['mobile_no'] = $param['mobile'];
+        if (isset($param['email'])) $post['email_address'] = $param['email'];
+        if (isset($param['extended'])) $post['extended_info'] = $param['extended'];
+        $post['is_test'] = false;
+
+        $option = [];
+        $option['type'] = 'post';
+        $option['encode'] = 'json';
+
+        $value = [];
+        foreach ($scene as $sc) {
+            $post['scene'] = $sc;
+            $risk = $this->Request($api, $post, $option);
+            if (is_string($risk)) {
+                $value[$sc] = $risk;
+            } else {
+                $value[$sc] = $risk['risk_rank'];
+            }
+        }
+
+        return $value;
+    }
+
+
+
     /**
      * 获取【小程序码】
      * 获取小程序码，适用于需要的码数量极多的业务场景。通过该接口生成的小程序码，永久有效，数量暂无限制。 更多用法详见 获取二维码。
