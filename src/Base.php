@@ -2,9 +2,9 @@
 
 namespace esp\weiXin;
 
+use Error;
 use esp\core\Library;
 use esp\dbs\redis\Redis;
-use esp\helper\library\Error;
 use esp\http\Http;
 use esp\http\HttpResult;
 use esp\helper\library\ext\Xml;
@@ -33,7 +33,6 @@ abstract class Base extends Library
 
     /**
      * @param array $data
-     * @throws Error
      */
     public function _init(array $data)
     {
@@ -45,7 +44,7 @@ abstract class Base extends Library
 
         if (!isset($conf['appid']) or empty($conf['appid'])) {
             $this->debug($data);
-            throw new \Error("wx conf 至少要含有appid");
+            throw new Error("wx conf 至少要含有appid");
         }
 
         $this->mpp = $conf;
@@ -61,7 +60,7 @@ abstract class Base extends Library
 
         } else if (!isset($conf['secret']) or empty($conf['secret'])) {
             $this->debug($data);
-            throw new \Error("wx conf 自主接入的应用至少要含有secret");
+            throw new Error("wx conf 自主接入的应用至少要含有secret");
         }
     }
 
