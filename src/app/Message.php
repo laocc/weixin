@@ -2,7 +2,6 @@
 
 namespace esp\weiXin\app;
 
-
 use esp\helper\library\ext\Xml;
 use esp\weiXin\Base;
 
@@ -13,7 +12,6 @@ final class Message extends Base
      * 小程序的客服消息
      * @param array $data
      * @return string
-     * @throws \esp\error\EspError
      */
     public function acceptMessage(array $data)
     {
