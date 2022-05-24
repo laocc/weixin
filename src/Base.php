@@ -198,11 +198,10 @@ abstract class Base extends Library
 
     /**
      * 检查信息是否错误
-     * @param $inArr
+     *
+     * @param array $inArr
      * @param array $allowCode
-     * @return array|mixed|string,
-     * array：原样返回，
-     * string：具体错误
+     * @return bool|mixed|string
      * @throws Exception
      */
     protected function checkError(array $inArr, array $allowCode = [])
@@ -220,12 +219,10 @@ abstract class Base extends Library
             return $returnInfo;
 
         } else if ($errCode === 48001) {
-            $returnInfo = '当前应用没有此接口权限';
-            return $returnInfo;
+            return '当前应用没有此接口权限';
 
         } else if ($errCode === 45015) {
-            $returnInfo = '此用户与公众号交互时间超过48小时';
-            return $returnInfo;
+            return '此用户与公众号交互时间超过48小时';
 
         } else if (in_array($errCode, $allowCode)) {
             //无错，或对于需要返回空值的错误代码
@@ -254,7 +251,10 @@ abstract class Base extends Library
     public function load_AccessToken()
     {
         $token = $this->Hash()->get("Access_Token_{$this->AppID}");
-        if ($token and $token['expires'] > time()) return $token;
+        if ($token) {
+            if (is_string($token)) $token = unserialize($token);
+            if ($token['expires'] > time()) return $token;
+        }
 
         $api = sprintf("/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", $this->mpp['appid'], $this->mpp['secret']);
         $dat = $this->Request($api);
