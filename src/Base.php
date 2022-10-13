@@ -2,7 +2,7 @@
 
 namespace esp\weiXin;
 
-use Error;
+use esp\error\Error;
 use esp\core\Library;
 use esp\dbs\redis\Redis;
 use esp\http\Http;
