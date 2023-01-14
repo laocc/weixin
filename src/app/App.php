@@ -176,4 +176,62 @@ class App extends Base
     }
 
 
+    /**
+     * 订阅物流消息
+     * @param $openid
+     * @param $receiver_phone
+     * @param $waybill_id
+     * @param $trans_id
+     * @param $goods_name
+     * @param $goods_pic_url
+     * @return bool|mixed|string
+     * @throws \Exception
+     */
+    public function followWaybill($openid, $receiver_phone, $waybill_id, $trans_id, $goods_name, $goods_pic_url)
+    {
+        $option = [];
+        $option['encode'] = 'html';
+//        $option['debug'] = false;
+
+        $data = [];
+        $data['openid'] = $openid;//不能携带参数（参数请放在scene字段里）
+        $data['receiver_phone'] = $receiver_phone;//280-1280
+        $data['waybill_id'] = $waybill_id;
+        $data['goods_info'] = [
+            'detail_list' => [
+                'goods_name' => $goods_name,
+                'goods_img_url' => $goods_pic_url
+            ]
+        ];
+        $data['trans_id'] = $trans_id;
+//        $data['is_hyaline'] = true;
+        $data = json_encode($data, 256 | 64);
+
+        $api = "/cgi-bin/express/delivery/open_msg/follow_waybill?access_token={access_token}";
+        return $this->Request1($api, $data, $option);
+    }
+
+    /**
+     * 更新用户积分
+     * @param array $param
+     * @return array
+     * @throws \Exception
+     */
+    public function updateUser(array $param, $token)
+    {
+        $api = "/card/membercard/updateuser?access_token=$token";
+
+        $post = [];
+        $post['code'] = $param['code'];
+        $post['card_id'] = $param['card_id'];
+        $post['add_bonus'] = $param['add_bonus'];
+
+        $option = [];
+        $option['type'] = 'post';
+        $option['encode'] = 'json';
+
+        return $this->Request($api, $post, $option);
+    }
+
+
 }

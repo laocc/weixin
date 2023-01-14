@@ -13,19 +13,16 @@ final class Platform extends Library
 {
     const wxApi = 'https://api.weixin.qq.com';
 
-    public $AppID;
-    public $AppAdminID;
+    public string $AppID;
+    public int $AppAdminID;
 
-    public $PlatformAppID;
-    public $PlatformToken;
-    public $PlatformEncodingAESKey;
-    public $PlatformURL;
-    private $PlatformAppSecret;
+    public string $PlatformAppID;
+    public string $PlatformToken;
+    public string $PlatformEncodingAESKey;
+    public string $PlatformURL;
+    private string $PlatformAppSecret;
 
-    /**
-     * @var $_Hash Hash
-     */
-    private $_Hash;
+    private Hash $_Hash;
 
     public function _init(array $open, string $AppID = '')
     {
@@ -103,6 +100,29 @@ final class Platform extends Library
         $back = urlencode(sprintf("%s/mpp/access/%s/%s/", $this->PlatformURL, $this->PlatformAppID, $adminID));
         $url = "https://mp.weixin.qq.com/safe/bindcomponent?action=bindcomponent&auth_type=%s&no_scan=1&component_appid=%s&pre_auth_code=%s&redirect_uri=%s#wechat_redirect";
         return sprintf($url, $type, $this->PlatformAppID, $value['pre_auth_code'], $back);
+    }
+
+
+    /**
+     * 快速注册微信小程序
+     */
+    public function registerMiniApp(array $param)
+    {
+        $api = "/cgi-bin/component/fastregisterweapp?action=create&component_access_token={component_access_token}";
+
+        $post = [];
+        $post['name'] = $param['name'];
+        $post['code'] = $param['code'];
+        $post['code_type'] = $param['code_type'];
+        $post['legal_persona_wechat'] = $param['legal_persona_wechat'];
+        $post['legal_persona_name'] = $param['legal_persona_name'];
+        $post['component_phone'] = $param['component_phone'];
+
+        $option = [];
+        $option['type'] = 'post';
+        $option['encode'] = 'json';
+
+        return $this->Request($api, $post, $option);
     }
 
     /**

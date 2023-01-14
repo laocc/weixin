@@ -7,7 +7,7 @@ use esp\weiXin\Send;
 
 final class Push extends Base implements Send
 {
-    private $api = "/cgi-bin/message/mass/sendall?access_token={access_token}";
+    private string $api = "/cgi-bin/message/mass/sendall?access_token={access_token}";
 
     public function setPreview()
     {

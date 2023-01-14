@@ -6,8 +6,8 @@ use Redis;
 
 class Hash
 {
-    private $redis;
-    private $key;
+    private Redis $redis;
+    private string $key;
 
     public function __construct(Redis $redis, string $hashKey)
     {

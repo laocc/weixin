@@ -15,20 +15,13 @@ abstract class Base extends Library
 {
     const wxApi = 'https://api.weixin.qq.com';
 
-    protected $AppID;
-    protected $mpp;
-    protected $openID;
-    protected $nick;
+    protected array $mpp;
+    protected string $AppID;
+    protected string $openID;
+    protected string $nick;
 
-    /**
-     * @var $Platform Platform
-     */
-    protected $Platform;
-
-    /**
-     * @var $_Hash Hash
-     */
-    protected $_Hash;
+    protected Platform $Platform;
+    protected Hash $_Hash;
 
 
     /**
@@ -156,7 +149,7 @@ abstract class Base extends Library
         tryOnce:
         $api = $url;
         if (strpos($api, '{access_token}')) {
-            if ($this->Platform instanceof Platform) {
+            if (isset($this->Platform)) {
                 $token = $this->Platform->appAccessToken();
             } else {
                 $token = $this->load_AccessToken();
@@ -267,7 +260,7 @@ abstract class Base extends Library
 
     public function token()
     {
-        if ($this->Platform instanceof Platform) {
+        if (isset($this->Platform)) {
             return $this->Platform->appAccessToken();
         } else {
             return $this->load_AccessToken();

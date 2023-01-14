@@ -9,7 +9,7 @@ namespace esp\weiXin\platform;
  */
 class Open
 {
-    private $platform;
+    private Platform $platform;
 
     public function __construct(Platform $platform)
     {

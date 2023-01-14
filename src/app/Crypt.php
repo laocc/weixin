@@ -5,8 +5,8 @@ namespace esp\weiXin\app;
 
 final class Crypt
 {
-    private $appid;
-    private $sessionKey;
+    private string $appid;
+    private string $sessionKey;
 
     /**
      * 解密小程序中用户授权时的信息等

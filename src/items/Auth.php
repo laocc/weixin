@@ -4,9 +4,9 @@ namespace esp\weiXin\items;
 
 final class Auth
 {
-    private $appid;
-    private $secret;
-    private $token;
+    private string $appid;
+    private string $secret;
+    private string $token;
 
     public function __construct(string $appid, string $secret, string $token = __FILE__)
     {
