@@ -13,8 +13,8 @@ final class Platform extends Library
 {
     const wxApi = 'https://api.weixin.qq.com';
 
-    public string $AppID;
     public int $AppAdminID;
+    public string $AppID;
 
     public string $PlatformAppID;
     public string $PlatformToken;

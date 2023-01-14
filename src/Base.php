@@ -17,8 +17,8 @@ abstract class Base extends Library
 
     protected array $mpp;
     protected string $AppID;
-    protected string $openID;
-    protected string $nick;
+    protected string $openID = '';
+    protected string $nick = '';
 
     protected Platform $Platform;
     protected Hash $_Hash;
