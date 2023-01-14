@@ -458,7 +458,7 @@ final class Platform extends Library
      * 9、推送授权相关通知
      * 1，在第三方平台创建审核通过后，微信服务器会向其“授权事件接收URL”每隔10分钟定时推送verify_ticket。
      * 2，当公众号对第三方平台进行授权、取消授权、更新授权后，微信服务器会向第三方平台方的授权事件接收URL（创建第三方平台时填写）推送相关通知。
-     * @return string
+     * @return string|array
      * @throws Exception
      */
     public function acceptGrantEvent()
@@ -508,10 +508,13 @@ final class Platform extends Library
             case 'unauthorized'://取消授权通知
                 $this->AppID = $data['AuthorizerAppid'];
                 break;
+            case 'notify_third_fasteregister'://快速注册小程序
+                if (isset($data['appid'])) $this->AppID = $data['appid'];
+                break;
             default:
         }
 
-        return $data['InfoType'];
+        return $data;
     }
 
     /**
