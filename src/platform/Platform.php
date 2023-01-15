@@ -106,24 +106,22 @@ final class Platform extends Library
     /**
      * 快速注册微信小程序
      */
-    public function registerMiniApp(array $param)
+    public function registerMiniApp(string $action, array $param)
     {
-        $api = "/cgi-bin/component/fastregisterweapp?action=create&component_access_token={component_access_token}";
+        switch ($action) {
+            case 'register':
+                $api = "/cgi-bin/component/fastregisterweapp?action=create&component_access_token={component_access_token}";
+                break;
+            case 'query':
+                $api = "/cgi-bin/component/fastregisterweapp?action=search&component_access_token={component_access_token}";
+                break;
+            default:
+                return $action;
+        }
 
-        $post = [];
-        $post['name'] = $param['name'];
-        $post['code'] = $param['code'];
-        $post['code_type'] = $param['code_type'];
-        $post['legal_persona_wechat'] = $param['legal_persona_wechat'];
-        $post['legal_persona_name'] = $param['legal_persona_name'];
-        $post['component_phone'] = $param['component_phone'];
-
-        $option = [];
-        $option['type'] = 'post';
-        $option['encode'] = 'json';
-
-        return $this->Request($api, $post, $option);
+        return $this->Request($api, $param);
     }
+
 
     /**
      * 授权接入URL
