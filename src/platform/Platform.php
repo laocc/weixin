@@ -108,18 +108,20 @@ final class Platform extends Library
      */
     public function miniApp(string $action, array $param)
     {
+        $option = [];
         switch ($action) {
             case 'register':
                 $api = "/cgi-bin/component/fastregisterweapp?action=create&component_access_token={component_access_token}";
                 break;
             case 'query':
+                $option['allow'] = ['all'];
                 $api = "/cgi-bin/component/fastregisterweapp?action=search&component_access_token={component_access_token}";
                 break;
             default:
                 return $action;
         }
 
-        return $this->Request($api, $param);
+        return $this->Request($api, $param, $option);
     }
 
 
@@ -655,6 +657,9 @@ final class Platform extends Library
         $errCode = intval($inArr["errcode"] ?? 0);
 
         if ($errCode === 0) {
+            return $inArr;
+
+        } else if ($allowCode === ['all']) {
             return $inArr;
 
         } else if (in_array($errCode, $allowCode)) {

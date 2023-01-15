@@ -216,6 +216,9 @@ abstract class Base extends Library
         } else if ($errCode === 45015) {
             return '此用户与公众号交互时间超过48小时';
 
+        } else if ($allowCode === ['all']) {
+            return true;
+
         } else if (in_array($errCode, $allowCode)) {
             //无错，或对于需要返回空值的错误代码
             return true;
