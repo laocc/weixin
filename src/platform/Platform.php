@@ -461,12 +461,12 @@ final class Platform extends Library
      * @return string|array
      * @throws Exception
      */
-    public function acceptGrantEvent()
+    public function acceptGrantEvent(string $input = null, array $get = [])
     {
-        $input = file_get_contents("php://input");
+        if (empty($input)) $input = file_get_contents("php://input");
         if (empty($input)) return 'null';
-        $debug = $this->debug($input);
-        $get = $_GET;
+        if (empty($get)) $get = $_GET;
+        $debug = $this->debug([$input, $get]);
 
         $crypt = new Crypt($this->PlatformAppID, $this->PlatformToken, $this->PlatformEncodingAESKey);
         $data = $crypt->decode($input, $get['msg_signature'] ?? '', $get['timestamp'] ?? '', $get['nonce'] ?? '');
