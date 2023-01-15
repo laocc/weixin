@@ -106,7 +106,7 @@ final class Platform extends Library
     /**
      * 快速注册微信小程序
      */
-    public function registerMiniApp(string $action, array $param)
+    public function miniApp(string $action, array $param)
     {
         switch ($action) {
             case 'register':
