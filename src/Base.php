@@ -48,8 +48,7 @@ abstract class Base extends Library
             unset($conf['platform_config']);
 
         } else if (isset($data['mppOpenKey']) and $data['mppOpenKey'] !== 'alone') {
-            $open = $this->config("open.{$data['mppOpenKey']}");
-            $this->Platform = new Platform($open, $this->AppID);
+            throw new Error("wx conf 传入mppOpenKey的方式已禁用，请直接传入完整的platform_config");
 
         } else if (!isset($conf['secret']) or empty($conf['secret'])) {
             $this->debug($data);
@@ -57,15 +56,17 @@ abstract class Base extends Library
         }
     }
 
-    protected function Hash()
+    protected function Hash(): Hash
     {
+        if (isset($this->_Hash)) return $this->_Hash;
         if (_CLI) {
-            $conf = $this->config('database.redis');
-            $rds = new Redis($conf);
-            return new Hash($rds->redis, 'aloneMPP');
+            //cli中config的redis不可靠，需要重新创建
+            $rds = new Redis($this->_controller->_config->_redis_conf);
+            $this->_Hash = new Hash($rds->redis, 'aloneMPP');
         } else {
-            return new Hash($this->_controller->_redis, 'aloneMPP');
+            $this->_Hash = new Hash($this->_controller->_redis, 'aloneMPP');
         }
+        return $this->_Hash;
     }
 
     /**

@@ -15,7 +15,8 @@
   },
   "autoload": {
     "psr-4": {
-      "esp\\weiXin\\": "src/"
+      "esp\\weiXin\\": "src/",
+      "esp\\weiXin\\platform\\": "platform/"
     }
   }
 }
