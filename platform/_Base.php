@@ -12,7 +12,6 @@ class _Base extends Library
 {
     const wxApi = 'https://api.weixin.qq.com';
 
-    protected int $AppAdminID;
     public string $AppID;
 
     protected string $PlatformAppID;

@@ -300,7 +300,7 @@ class Platform extends _Base
                 $code = $this->_Hash->get(md5($data['PreAuthCode']));
                 if (empty($code)) break;
 
-                $this->AppAdminID = intval($code['adminID'] ?? 0);
+                $data['AppAdminID'] = intval($code['adminID'] ?? 0);
 
                 $this->token("AuthorizationCode", [
                     'code' => $data['AuthorizationCode'],
