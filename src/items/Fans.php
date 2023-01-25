@@ -69,11 +69,10 @@ final class Fans extends Base
     public function redirectWeixin(array $option)
     {
         $backUrl = $option['url'] ?? null;  //最后要跳回来的页面
-        if (is_null($backUrl)) $backUrl = _HTTP_ . getenv('HTTP_HOST') . getenv('REQUEST_URI');
+        if (is_null($backUrl)) $backUrl = _URL;
 
         $param = [];
         $param['appid'] = $this->AppID;
-        $param['redirect_uri'] = '';
         $param['response_type'] = 'code';
         $param['scope'] = ($option['scope'] ?? 'snsapi_base');//"snsapi_userinfo" : 'snsapi_base'
         $param['state'] = $this->sign_url();

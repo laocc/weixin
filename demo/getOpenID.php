@@ -39,7 +39,7 @@ function openidGet()
      * 但实际是需要回到 web.host.com
      * 所以这时要手工指定跳回来的URL
      */
-    $option['url'] = _HTTP_ . getenv('HTTP_HOST') . getenv('REQUEST_URI');
+    $option['url'] = _URL;
 
     //"snsapi_userinfo" : 'snsapi_base'，默认snsapi_base
     $option['scope'] = 'snsapi_base';

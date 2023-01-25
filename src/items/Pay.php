@@ -18,7 +18,7 @@ final class Pay extends Base
     public function refundPay(array $payment)
     {
         $notifyUrl = $payment['notify'] ?? $payment['notify_url'];
-        if ($notifyUrl[0] === '/') $notifyUrl = _HTTP_ . "api." . _HOST . $notifyUrl;
+        if ($notifyUrl[0] === '/') $notifyUrl = (_HTTPS ? 'https:' : 'http:') . "//api." . _HOST . $notifyUrl;
 
         $payInfo = array();
         $payInfo['appid'] = $this->mch['appid'];

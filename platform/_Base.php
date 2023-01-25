@@ -14,10 +14,10 @@ class _Base extends Library
 
     public string $AppID;
 
-    protected string $PlatformAppID;
+    public string $PlatformAppID;
+    public string $PlatformURL;
     protected string $PlatformToken;
     protected string $PlatformEncodingAESKey;
-    protected string $PlatformURL;
     protected string $PlatformAppSecret;
 
     protected Hash $_Hash;
