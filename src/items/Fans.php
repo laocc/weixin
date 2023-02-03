@@ -7,6 +7,7 @@ use Exception;
 
 final class Fans extends Base
 {
+    private string $openIdKey = '_openid_';
 
     /**
      * 读取某一个用户
@@ -78,7 +79,7 @@ final class Fans extends Base
         $param['state'] = $this->sign_url();
         $param['redirect_uri'] = $backUrl;
 
-        if ($this->Platform) {
+        if (isset($this->Platform)) {
             $data = [
                 'appid' => $this->AppID,
                 'pay' => $option['pay'] ?? 0,
@@ -103,7 +104,6 @@ final class Fans extends Base
         $this->redirect($api);
     }
 
-    private $openIdKey = '_openid_';
 
     /**
      * @param array $option

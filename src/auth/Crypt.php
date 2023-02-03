@@ -5,10 +5,10 @@ namespace esp\weiXin\auth;
 
 final class Crypt
 {
-    private $token;
-    private $appId;
-    private $dataType;
-    private $encodingAesKey;
+    private string $token;
+    private string $appId;
+    private string $dataType;
+    private string $encodingAesKey;
 
     /**
      * 公众平台、小程序消息解密

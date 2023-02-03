@@ -70,7 +70,7 @@ abstract class WeiChat
 
     public static function Auth(array $conf)
     {
-        return new Auth($conf);
+        return new Auth($conf['appid'], $conf['secret']);
     }
 
     public static function Template(array $conf)

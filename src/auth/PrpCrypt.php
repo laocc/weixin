@@ -9,7 +9,7 @@ namespace esp\weiXin\auth;
  */
 final class PrpCrypt
 {
-    public $key;
+    public string $key;
 
     function __construct($k)
     {
@@ -84,7 +84,7 @@ final class PrpCrypt
      * @param int $len
      * @return string
      */
-    private function getRandomStr(int $len = 16)
+    private function getRandomStr(int $len = 16): string
     {
         $str = "";
         $str_pol = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";

@@ -133,11 +133,11 @@ class Subscribe extends Base
         $data['weapp_template_msg']['emphasis_keyword'] = 3333;
 
         $data['mp_template_msg'] = [];
-        $data['mp_template_msg']['appid'] = $this->_app['mppid'];
+        $data['mp_template_msg']['appid'] = $this->mpp['mppid'];
         $data['mp_template_msg']['template_id'] = 3333;
         $data['mp_template_msg']['url'] = 3333;
         $data['mp_template_msg']['miniprogram'] = [];
-        $data['mp_template_msg']['miniprogram']['appid'] = $this->_app['appid'];
+        $data['mp_template_msg']['miniprogram']['appid'] = $this->mpp['appid'];
         $data['mp_template_msg']['miniprogram']['pagepath'] = 333;
         $data['mp_template_msg']['data'] = 3333;
 

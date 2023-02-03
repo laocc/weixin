@@ -2,6 +2,9 @@
 
 namespace esp\weiXin\items;
 
+/**
+ * 微信开放平台的网站应用，授权网站登录
+ */
 final class Auth
 {
     private string $appid;
