@@ -130,6 +130,8 @@ class Platform extends _Base
 
     /**
      * 6、获取授权方的帐号基本信息
+     * https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/token/api_get_authorizer_info.html#%E8%AF%B7%E6%B1%82%E5%9C%B0%E5%9D%80
+     * 权限集说明：https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/product/miniprogram_authority.html
      */
     public function getAppInfo()
     {
@@ -142,9 +144,7 @@ class Platform extends _Base
         $this->debug($value);
         if (is_string($value)) return $value;
 
-        if (isset($value['errcode']) and $value['errcode'] > 0) {
-            return $value['errmsg'];
-        }
+        if (intval($value['errcode'] ?? 0)) return $value['errmsg'];
 
         $auth = [];
         $getApi = true;
