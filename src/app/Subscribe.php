@@ -3,6 +3,9 @@
 namespace esp\weiXin\app;
 
 
+use esp\http\HttpResult;
+use Exception;
+
 /**
  * 小程序订阅消息
  * Class Subscribe
@@ -63,8 +66,8 @@ class Subscribe extends _Base
     /**
      * 获取所有已注册的模版
      * @param string $tempID
-     * @return array|\esp\http\HttpResult|mixed|string
-     * @throws \Exception
+     * @return array|string
+     * @throws Exception
      */
     public function getAllTemplate(string $tempID = '')
     {
@@ -113,8 +116,8 @@ class Subscribe extends _Base
      * @param string $openID
      * @param array $app
      * @param array $mpp
-     * @return array|bool|\esp\http\HttpResult|mixed|string
-     * @throws \Exception
+     * @return array|bool|HttpResult|mixed|string
+     * @throws Exception
      *
      * https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/uniform-message/uniformMessage.send.html
      *
