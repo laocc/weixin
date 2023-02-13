@@ -1,6 +1,6 @@
 <?php
 
-namespace esp\weiXin;
+namespace esp\weiXin\send;
 
 interface Send
 {

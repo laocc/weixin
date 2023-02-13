@@ -2,9 +2,8 @@
 
 namespace esp\weiXin\items;
 
-use esp\weiXin\Base;
 
-final class Mpp extends Base
+final class Mpp extends _Base
 {
 
     /**

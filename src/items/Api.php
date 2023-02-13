@@ -2,11 +2,10 @@
 
 namespace esp\weiXin\items;
 
-use esp\weiXin\Base;
 use Exception;
 use function esp\helper\str_rand;
 
-final class Api extends Base
+final class Api extends _Base
 {
 
     /**

@@ -3,9 +3,8 @@
 namespace esp\weiXin\items;
 
 use function esp\helper\str_rand;
-use esp\weiXin\Base;
 
-final class Pay extends Base
+final class Pay extends _Base
 {
     public array $mch;
 

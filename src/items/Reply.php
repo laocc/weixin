@@ -3,9 +3,8 @@
 namespace esp\weiXin\items;
 
 use esp\helper\library\request\Get;
-use esp\weiXin\Base;
 
-final class Reply extends Base
+final class Reply extends _Base
 {
 
     /**

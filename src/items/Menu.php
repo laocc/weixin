@@ -2,9 +2,8 @@
 
 namespace esp\weiXin\items;
 
-use esp\weiXin\Base;
 
-final class Menu extends Base
+final class Menu extends _Base
 {
 
     /**

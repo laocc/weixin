@@ -2,10 +2,9 @@
 
 namespace esp\weiXin\items;
 
-use esp\weiXin\Base;
 use Exception;
 
-final class Tag extends Base
+final class Tag extends _Base
 {
 
     //(48001)api unauthorized rid: 5f591bf1-7d33c952-38db6b0e

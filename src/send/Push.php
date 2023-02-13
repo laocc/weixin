@@ -1,11 +1,9 @@
 <?php
 
-namespace esp\weiXin\items;
+namespace esp\weiXin\send;
 
-use esp\weiXin\Base;
-use esp\weiXin\Send;
 
-final class Push extends Base implements Send
+class Push extends _Base implements Send
 {
     private string $api = "/cgi-bin/message/mass/sendall?access_token={access_token}";
 

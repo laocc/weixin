@@ -2,14 +2,13 @@
 
 namespace esp\weiXin\app;
 
-use esp\weiXin\Base;
 
 /**
  * 小程序订阅消息
  * Class Subscribe
  * @package esp\weiXin\items
  */
-class Subscribe extends Base
+class Subscribe extends _Base
 {
 
     /**

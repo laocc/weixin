@@ -2,10 +2,9 @@
 
 namespace esp\weiXin\items;
 
-use esp\weiXin\Base;
 use Exception;
 
-final class Fans extends Base
+final class Fans extends _Base
 {
     private string $openIdKey = '_openid_';
 

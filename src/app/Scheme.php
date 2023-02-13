@@ -2,10 +2,9 @@
 
 namespace esp\weiXin\app;
 
-use esp\weiXin\Base;
 use Exception;
 
-class Scheme extends Base
+class Scheme extends _Base
 {
     /**
      * @param array $jump

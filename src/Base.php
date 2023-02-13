@@ -26,8 +26,10 @@ abstract class Base extends Library
 
     /**
      * @param array $data
+     * @param Platform|null $platform
+     * @throws Error
      */
-    public function _init(array $data)
+    public function _init(array $data, Platform $platform = null)
     {
         $conf = [];
         foreach ($data as $k => $v) {
@@ -43,7 +45,10 @@ abstract class Base extends Library
         $this->mpp = $conf;
         $this->AppID = $conf['appid'];//当前公众号或小程序的appid
 
-        if (isset($conf['platform_config'])) {
+        if ($platform instanceof Platform) {
+            $this->Platform = $platform;
+
+        } else if (isset($conf['platform_config'])) {
             $this->Platform = new Platform($conf['platform_config'], $this->AppID);
             unset($conf['platform_config']);
 

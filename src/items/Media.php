@@ -3,10 +3,9 @@
 namespace esp\weiXin\items;
 
 use esp\http\HttpResult;
-use esp\weiXin\Base;
 use Exception;
 
-final class Media extends Base
+final class Media extends _Base
 {
 
     public function article($data)

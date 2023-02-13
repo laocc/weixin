@@ -1,11 +1,9 @@
 <?php
 
-namespace esp\weiXin\items;
+namespace esp\weiXin\send;
 
-use esp\weiXin\Base;
-use esp\weiXin\Send;
 
-final class Custom extends Base implements Send
+class Custom extends _Base implements Send
 {
     private string $custom;
 

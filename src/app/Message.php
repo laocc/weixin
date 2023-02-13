@@ -3,9 +3,8 @@
 namespace esp\weiXin\app;
 
 use esp\helper\library\ext\Xml;
-use esp\weiXin\Base;
 
-final class Message extends Base
+final class Message extends _Base
 {
 
     /**
