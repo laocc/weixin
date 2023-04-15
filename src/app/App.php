@@ -2,6 +2,7 @@
 
 namespace esp\weiXin\app;
 
+use esp\weiXin\platform\Platform;
 use function esp\helper\mk_dir;
 
 class App extends _Base
@@ -48,7 +49,6 @@ class App extends _Base
 
         return $value;
     }
-
 
 
     /**
@@ -207,7 +207,7 @@ class App extends _Base
         $data = json_encode($data, 256 | 64);
 
         $api = "/cgi-bin/express/delivery/open_msg/follow_waybill?access_token={access_token}";
-        return $this->Request1($api, $data, $option);
+        return $this->Request($api, $data, $option);
     }
 
     /**
