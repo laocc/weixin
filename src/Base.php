@@ -2,6 +2,7 @@
 
 namespace esp\weiXin;
 
+use esp\dbs\redis\RedisHash;
 use esp\error\Error;
 use esp\core\Library;
 use esp\dbs\redis\Redis;
@@ -19,9 +20,12 @@ abstract class Base extends Library
     protected string $AppID;
     protected string $openID = '';
     protected string $nick = '';
+    protected string $platAccessToken;
+    protected string $appAccessToken;
 
     protected Platform $Platform;
-    protected Hash $_Hash;
+//    protected Hash $_Hash;
+    protected RedisHash $_Hash;
 
 
     /**
@@ -61,15 +65,27 @@ abstract class Base extends Library
         }
     }
 
-    protected function Hash(): Hash
+    /**
+     * _CLI模式下，建议先传入redis以创建hash
+     *
+     * @param Redis|null $redis
+     * @return RedisHash
+     * @throws Error
+     */
+    public function Hash(Redis $redis = null): RedisHash
     {
         if (isset($this->_Hash)) return $this->_Hash;
-        if (_CLI) {
+
+        if (!is_null($redis)) {
+            $this->_Hash = $redis->hash('aloneMPP');
+
+        } else if (_CLI) {
             //cli中config的redis不可靠，需要重新创建
             $rds = new Redis($this->_controller->_config->_redis_conf);
-            $this->_Hash = new Hash($rds->redis, 'aloneMPP');
+            $this->_Hash = $rds->hash('aloneMPP');
+
         } else {
-            $this->_Hash = new Hash($this->_controller->_redis, 'aloneMPP');
+            $this->_Hash = new RedisHash($this->_controller->_redis, 'aloneMPP');
         }
         return $this->_Hash;
     }
@@ -155,17 +171,12 @@ abstract class Base extends Library
         tryOnce:
         $api = $url;
         if (strpos($api, '{access_token}')) {
-            if (isset($this->Platform)) {
-                $token = $this->Platform->appAccessToken();
-            } else {
-                $token = $this->load_AccessToken();
-            }
-            if (is_string($token)) return $token;
-            $api = str_replace('{access_token}', $token['token'], $api);
+            $api = str_replace('{access_token}', $this->token(), $api);
         }
         if ($api[0] === '/') $api = $this::wxApi . $api;
 
-        $request = (new Http($option))->data($data)->request($api);
+        $http = new Http($option);
+        $request = $http->data($data)->request($api);
 
         $this->debug([$api, $data, $option, $request]);
         if ($err = $request->error()) return $err;
@@ -191,6 +202,25 @@ abstract class Base extends Library
         }
 
         return $value;
+    }
+
+    /**
+     * @return string
+     * @throws Exception
+     */
+    public function token(): string
+    {
+        if (isset($this->Platform)) {
+            if (isset($this->platAccessToken)) return $this->platAccessToken;
+
+            $token = $this->Platform->appAccessToken();
+            return $this->platAccessToken = $token['token'];
+        } else {
+            if (isset($this->appAccessToken)) return $this->appAccessToken;
+
+            $token = $this->load_AccessToken();
+            return $this->appAccessToken = $token['token'];
+        }
     }
 
 
@@ -260,20 +290,10 @@ abstract class Base extends Library
         $api = sprintf("/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", $this->mpp['appid'], $this->mpp['secret']);
         $dat = $this->Request($api);
         if (is_string($dat)) return $dat;
-
         $val = ['token' => $dat['access_token'], 'expires' => intval($dat['expires_in']) + time() - 100];
         $this->Hash()->set("Access_Token_{$this->AppID}", $val);
 
         return $val;
-    }
-
-    public function token()
-    {
-        if (isset($this->Platform)) {
-            return $this->Platform->appAccessToken();
-        } else {
-            return $this->load_AccessToken();
-        }
     }
 
     /**

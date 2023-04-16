@@ -2,7 +2,6 @@
 
 namespace esp\weiXin\app;
 
-use esp\weiXin\platform\Platform;
 use function esp\helper\mk_dir;
 
 class App extends _Base

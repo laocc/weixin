@@ -136,11 +136,10 @@ class _Base extends Library
 
         if ($api[0] === '/') $api = $this::wxApi . $api;
 
-        $postVal = (new Http($option))->data($data)->post($api);
-        $this->debug($postVal);
-
+        $http = new Http($option);
+        $postVal = $http->data($data)->post($api);
+//        $this->debug($postVal);
         $value = $postVal->data();
-
         $this->debug(['api' => $api, 'data' => $data, 'value' => $value], 1);
 
         $check = $this->checkError($value, $option['allow'] ?? []);

@@ -11,7 +11,7 @@ class Hash
 
     public function __construct(Redis $redis, string $hashKey)
     {
-        $this->redis = $redis;
+        $this->redis = &$redis;
         $this->key = $hashKey;
     }
 
