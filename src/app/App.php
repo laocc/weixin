@@ -2,6 +2,7 @@
 
 namespace esp\weiXin\app;
 
+use Exception;
 use function esp\helper\mk_dir;
 
 class App extends _Base
@@ -183,7 +184,7 @@ class App extends _Base
      * @param $goods_name
      * @param $goods_pic_url
      * @return bool|mixed|string
-     * @throws \Exception
+     * @throws Exception
      */
     public function followWaybill($openid, $receiver_phone, $waybill_id, $trans_id, $goods_name, $goods_pic_url)
     {
@@ -213,12 +214,10 @@ class App extends _Base
      * 更新用户积分
      * @param array $param
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
-    public function updateUser(array $param, $token)
+    public function updateUser(array $param)
     {
-        $api = "/card/membercard/updateuser?access_token=$token";
-
         $post = [];
         $post['code'] = $param['code'];
         $post['card_id'] = $param['card_id'];
@@ -228,6 +227,7 @@ class App extends _Base
         $option['type'] = 'post';
         $option['encode'] = 'json';
 
+        $api = "/card/membercard/updateuser?access_token={access_token}";
         return $this->Request($api, $post, $option);
     }
 
