@@ -26,6 +26,7 @@ abstract class Base extends Library
     protected Platform $Platform;
 //    protected Hash $_Hash;
     protected RedisHash $_Hash;
+    protected Redis $_Redis;
 
 
     /**
@@ -65,6 +66,13 @@ abstract class Base extends Library
         }
     }
 
+    public function setRedis(Redis $redis)
+    {
+        $this->_Redis = $redis;
+        return $this;
+    }
+
+
     /**
      * _CLI模式下，建议先传入redis以创建hash
      *
@@ -77,16 +85,20 @@ abstract class Base extends Library
         if (isset($this->_Hash)) return $this->_Hash;
 
         if (!is_null($redis)) {
-            $this->_Hash = $redis->hash('aloneMPP');
+            $rds =& $redis->redis;
 
-        } else if (_CLI) {
-            //cli中config的redis不可靠，需要重新创建
-            $rds = new Redis($this->_controller->_config->_redis_conf);
-            $this->_Hash = $rds->hash('aloneMPP');
+        } else if (isset($this->_Redis)) {
+            $rds =& $this->_Redis->redis;
+
+        } else if (_CLI) {            //cli中config的redis不可靠，需要重新创建
+            $newRedis = new Redis($this->_controller->_config->_redis_conf);
+            $rds =& $newRedis->redis;
 
         } else {
-            $this->_Hash = new RedisHash($this->_controller->_redis, 'aloneMPP');
+            $rds =& $this->_controller->_redis;
         }
+
+        $this->_Hash = new RedisHash($rds, 'aloneMPP');
         return $this->_Hash;
     }
 
