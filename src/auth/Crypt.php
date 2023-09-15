@@ -193,7 +193,7 @@ XML;
             sort($array, SORT_STRING);
             $str = implode($array);
             return array(ErrorCode::$OK, sha1($str));
-        } catch (\Exception $e) {
+        } catch (\Error|\Exception $e) {
             return array(ErrorCode::$ComputeSignatureError, null);
         }
     }
@@ -212,7 +212,7 @@ XML;
             $array_e = $xml->getElementsByTagName('Encrypt');
             $encrypt = $array_e->item(0)->nodeValue;
             return array(0, $encrypt);
-        } catch (\Exception $e) {
+        } catch (\Exception|\Error $e) {
             return array(ErrorCode::$ParseXmlError, null);
         }
     }
