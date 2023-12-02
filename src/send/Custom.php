@@ -87,11 +87,11 @@ class Custom extends _Base implements Send
     public function media(string $mediaID)
     {
         $api = "/cgi-bin/media/get?access_token={access_token}&media_id={$mediaID}";
-        $option = ['type' => 'get', 'encode' => 'buffer'];
+        $option = ['type' => 'get', 'encode' => 'html'];
         $req = $this->Request($api, null, $option);
-        if ($req->error()) return $req->_message;
         if (isset($req->abnormal)) return 'data:image/png;base64,' . $req->abnormal;
-        return $req->data();
+//        if ($req->error()) return $req->_message;
+        return json_decode($req->_html, true);
     }
 
     /**
