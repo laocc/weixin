@@ -193,9 +193,6 @@ abstract class Base extends Library
         $this->debug([$api, $data, $option, $request]);
         if ($err = $request->error()) return $err;
 
-        $error = $request->error();
-        if ($error) return $error;
-
         if ($option['encode'] === 'html') return $request;
 
         $value = $request->data();
