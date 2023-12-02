@@ -190,7 +190,8 @@ abstract class Base extends Library
         $http = new Http($option);
         $request = $http->data($data)->request($api);
 
-        $this->debug([$api, $data, $option, $request]);
+        if (isset($option['debug'])) $this->debug([$api, $data, $option, $request]);
+
         if ($err = $request->error()) return $err;
 
         if ($option['encode'] === 'html') return $request;
