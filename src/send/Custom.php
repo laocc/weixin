@@ -3,6 +3,8 @@
 namespace esp\weiXin\send;
 
 
+use Exception;
+
 class Custom extends _Base implements Send
 {
     private string $custom;
@@ -23,7 +25,7 @@ class Custom extends _Base implements Send
      * @param array $content
      * @param array $option
      * @return bool|mixed|string
-     * @throws \Exception
+     * @throws Exception
      *
      * https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Service_Center_messages.html#7
      *
@@ -63,7 +65,7 @@ class Custom extends _Base implements Send
      * @param array $data
      * @param array $option
      * @return bool|mixed|string
-     * @throws \Exception
+     * @throws Exception
      */
     public function post(array $data, array $option = [])
     {
@@ -75,15 +77,33 @@ class Custom extends _Base implements Send
     }
 
 
+    /**
+     * 下载用户发送的图片
+     * https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/kf-mgnt/kf-message/getTempMedia.html
+     * @param string $mediaID
+     * @return array|mixed|string|null
+     * @throws Exception
+     */
     public function media(string $mediaID)
     {
         $api = "/cgi-bin/media/get?access_token={access_token}&media_id={$mediaID}";
-        $option = ['type' => 'get', 'encode' => 'json'];
+        $option = ['type' => 'get', 'encode' => 'buffer'];
         $req = $this->Request($api, null, $option);
         if ($req->error()) return $req->_message;
         if (isset($req->abnormal)) return 'data:image/png;base64,' . $req->abnormal;
         return $req->data();
     }
+
+    /**
+     * 上传图片，用于发送给用户
+     * https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/kf-mgnt/kf-message/uploadTempMedia.html
+     * @return void
+     */
+    public function upload()
+    {
+
+    }
+
 
     /**
      * 文本回复
