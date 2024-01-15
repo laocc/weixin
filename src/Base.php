@@ -212,7 +212,7 @@ abstract class Base extends Library
         }
 
         if (intval($value['errcode'] ?? '') !== 0) return $value['errmsg'];
-        if (strtolower($value['errmsg'] ?? '') !== 'ok') return $value['errmsg'];
+//        if (strtolower($value['errmsg'] ?? '') !== 'ok') return $value['errmsg'];
 
         return $value;
     }

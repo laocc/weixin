@@ -134,7 +134,8 @@ class Ship extends _Base
     public function state(array $params)
     {
         $value = [];
-        $value['appid'] = $params['appid'];
+        $value['appid'] = $this->AppID;
+        if (isset($params['appid'])) $value['appid'] = $params['appid'];
 
         $result = [];
         $result['trade'] = $this->Request('/wxa/sec/order/is_trade_managed?access_token={access_token}', $value);
