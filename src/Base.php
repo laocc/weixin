@@ -23,6 +23,7 @@ abstract class Base extends Library
     protected string $platAccessToken;
     protected string $appAccessToken;
     private bool $returnBase = false;
+    private bool $saveDebug = false;
 
     protected Platform $Platform;
 //    protected Hash $_Hash;
@@ -44,7 +45,7 @@ abstract class Base extends Library
         }
 
         if (!isset($conf['appid']) or empty($conf['appid'])) {
-            $this->debug($data);
+            if (!_CLI) $this->debug($data);
             throw new Error("wx conf 至少要含有appid");
         }
 
@@ -62,7 +63,7 @@ abstract class Base extends Library
             throw new Error("wx conf 传入mppOpenKey的方式已禁用，请直接传入完整的platform_config");
 
         } else if (!isset($conf['secret']) or empty($conf['secret'])) {
-            $this->debug($data);
+            if (!_CLI) $this->debug($data);
             throw new Error("wx conf 自主接入的应用至少要含有secret");
         }
     }
@@ -76,6 +77,11 @@ abstract class Base extends Library
     public function setReturnBase(bool $set)
     {
         $this->returnBase = $set;
+    }
+
+    public function setSaveDebug(bool $set)
+    {
+        $this->saveDebug = $set;
     }
 
     /**
@@ -195,8 +201,7 @@ abstract class Base extends Library
         $http = new Http($option);
         $request = $http->data($data)->request($api);
         if ($this->returnBase) return $request;
-
-        if (isset($option['debug'])) $this->debug([$api, $data, $option, $request]);
+        if (!_CLI and $this->saveDebug or isset($option['debug'])) $this->debug([$api, $data, $option, $request]);
 
         if ($err = $request->error()) return $err;
 
