@@ -28,7 +28,14 @@ class Ship extends _Base
 //            'out_trade_no' => 0000,
         ];
 
-        $value['logistics_type'] = intval($params['type']);//物流模式：1、快递公司物流配送 2、同城配送 3、虚拟商品，虚拟商品，例如话费充值，点卡等，无实体配送形式 4、用户自提
+        /**
+         * 物流模式：
+         * 1、快递公司物流配送
+         * 2、同城配送
+         * 3、虚拟商品，虚拟商品，例如话费充值，点卡等，无实体配送形式
+         * 4、用户自提
+         */
+        $value['logistics_type'] = intval($params['type']);
         $value['delivery_mode'] = 'UNIFIED_DELIVERY';//发货模式：1、UNIFIED_DELIVERY（统一发货）2、SPLIT_DELIVERY（分拆发货） 示例值: UNIFIED_DELIVERY
 //        $value['is_all_delivered'] = true;//是否已全部发货完成,分拆发货模式时必填
 
@@ -36,8 +43,17 @@ class Ship extends _Base
         $value['shipping_list'] = ['item_desc' => $params['goods']];
 
         if ($value['logistics_type'] === 1) {//物流模式
+            $expCarrier = [];
+            $expCarrier['jitu'] = 'JTSD';
+            $expCarrier['deppon'] = 'DBL';
+            $expCarrier['yunda'] = 'YD';
+
             $value['shipping_list']['tracking_no'] = $params['express']['waybill'];//快递单号
-            $value['shipping_list']['express_company'] = $params['express']['company'];//快递单号
+            $value['shipping_list']['express_company'] = strtoupper($params['express']['company']);
+            if (isset($expCarrier[$value['shipping_list']['express_company']])) {
+                $value['shipping_list']['express_company'] = $expCarrier[$value['shipping_list']['express_company']];
+            }
+
             if (strtoupper($value['shipping_list']['express_company']) === 'SF') {//顺丰必填
                 $value['shipping_list']['contact'] = [];
                 if (isset($params['sender'])) $value['shipping_list']['contact']['consignor_contact'] = $params['sender'];
