@@ -36,11 +36,11 @@ class Ship extends _Base
          * 4、用户自提
          */
         $value['logistics_type'] = intval($params['type']);
-        $value['delivery_mode'] = 'UNIFIED_DELIVERY';//发货模式：1、UNIFIED_DELIVERY（统一发货）2、SPLIT_DELIVERY（分拆发货） 示例值: UNIFIED_DELIVERY
+        $value['delivery_mode'] = 1;//发货模式：1、UNIFIED_DELIVERY（统一发货）2、SPLIT_DELIVERY（分拆发货） 示例值: UNIFIED_DELIVERY
 //        $value['is_all_delivered'] = true;//是否已全部发货完成,分拆发货模式时必填
 
         $value['upload_time'] = date(DATE_RFC3339);
-        $value['shipping_list'] = ['item_desc' => $params['goods']];
+        $item = ['item_desc' => $params['goods']];
 
         if ($value['logistics_type'] === 1) {//物流模式
             $expCarrier = [];
@@ -48,18 +48,19 @@ class Ship extends _Base
             $expCarrier['deppon'] = 'DBL';
             $expCarrier['yunda'] = 'YD';
 
-            $value['shipping_list']['tracking_no'] = $params['express']['waybill'];//快递单号
-            $value['shipping_list']['express_company'] = strtoupper($params['express']['company']);
-            if (isset($expCarrier[$value['shipping_list']['express_company']])) {
-                $value['shipping_list']['express_company'] = $expCarrier[$value['shipping_list']['express_company']];
+            $item['tracking_no'] = $params['express']['waybill'];//快递单号
+            $item['express_company'] = strtoupper($params['express']['company']);
+            if (isset($expCarrier[$item['express_company']])) {
+                $item['express_company'] = $expCarrier[$item['express_company']];
             }
 
-            if (strtoupper($value['shipping_list']['express_company']) === 'SF') {//顺丰必填
-                $value['shipping_list']['contact'] = [];
-                if (isset($params['sender'])) $value['shipping_list']['contact']['consignor_contact'] = $params['sender'];
-                if (isset($params['receiver'])) $value['shipping_list']['contact']['receiver_contact'] = $params['receiver'];
+            if (strtoupper($item['express_company']) === 'SF') {//顺丰必填
+                $item['contact'] = [];
+                if (isset($params['sender'])) $item['contact']['consignor_contact'] = $params['sender'];
+                if (isset($params['receiver'])) $item['contact']['receiver_contact'] = $params['receiver'];
             }
         }
+        $value['shipping_list'] = [$item];
 
         $value['payer'] = ['openid' => $params['openid']];
 
@@ -104,7 +105,19 @@ class Ship extends _Base
         if (isset($params['size'])) $value['page_size'] = $params['size'];
 
         $api = "/wxa/sec/order/get_order_list?access_token={access_token}";
-        return $this->Request($api, $value);
+        $orders = $this->Request($api, $value);
+        if (is_string($orders)) return $orders;
+        $result = [];
+        foreach ($orders['order_list'] as $ord) {
+            $result[] = [
+                'waybill' => $ord['transaction_id'],
+                'order' => $ord['merchant_trade_no'],
+                'openid' => $ord['openid'],
+                'state' => $ord['order_state'],//状态订单：(1) 待发货；(2) 已发货；(3) 确认收货；(4) 交易完成；(5) 已退款。
+                'merchant' => $ord['merchant_id'],//商户
+            ];
+        }
+        return $result;
     }
 
     /**
