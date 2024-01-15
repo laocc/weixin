@@ -88,7 +88,7 @@ class Ship extends _Base
      * 查询订单列表
      *
      * @param array $params
-     * @return array|HttpResult|mixed|string|null
+     * @return array|string
      * @throws Exception
      */
     public function order(array $params)
