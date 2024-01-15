@@ -1,0 +1,10 @@
+<?php
+
+namespace esp\weiXin\express;
+
+use esp\weiXin\Base;
+
+abstract class _Base extends Base
+{
+
+}
