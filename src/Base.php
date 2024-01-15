@@ -22,6 +22,7 @@ abstract class Base extends Library
     protected string $nick = '';
     protected string $platAccessToken;
     protected string $appAccessToken;
+    private bool $returnBase = false;
 
     protected Platform $Platform;
 //    protected Hash $_Hash;
@@ -72,6 +73,10 @@ abstract class Base extends Library
         return $this;
     }
 
+    public function setReturnBase(bool $set)
+    {
+        $this->returnBase = $set;
+    }
 
     /**
      * _CLI模式下，建议先传入redis以创建hash
@@ -189,6 +194,7 @@ abstract class Base extends Library
 
         $http = new Http($option);
         $request = $http->data($data)->request($api);
+        if ($this->returnBase) return $request;
 
         if (isset($option['debug'])) $this->debug([$api, $data, $option, $request]);
 
