@@ -69,30 +69,27 @@ class App extends _Base
     public function getUnlimited(string $fileName, string $scene, array $params = [])
     {
         $option = [];
-        $option['encode'] = 'html';
-//        $option['debug'] = false;
+        $option['encode'] = 'json';
+        $option['decode'] = 'buffer';
+        $option['buffer'] = $fileName;
 
         $data = [];
         $data['page'] = 'init';//不能携带参数（参数请放在scene字段里）
         $data['width'] = 240;//280-1280
         $data['scene'] = $scene;
-//        $data['is_hyaline'] = true;
-        $data = json_encode($params + $data, 256 | 64);
+//        $data['is_hyaline'] = true;//默认是false，是否需要透明底色，为 true 时，生成透明底色的小程序
 
         $api = "/wxa/getwxacodeunlimit?access_token={access_token}";
-        $rest = $this->Request($api, $data, $option);
+        $rest = $this->Request($api, $params + $data, $option);
         if (is_string($rest)) return $rest;
         if ($msg = $rest->error()) return $msg;
+
         $html = $rest->html();
         if ($html[0] === '{') {
             $json = json_decode($html, true);
             return $json['errmsg'] ?? $html;
         }
 
-        mk_dir($fileName);
-        $file = fopen($fileName, "w");
-        fwrite($file, $html);
-        fclose($file);
         return true;
     }
 
@@ -101,7 +98,7 @@ class App extends _Base
      * https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.get.html
      * path可以带参数，但是 与 wxacode.createQRCode 总共生成的码数量限制为 10万条
      * 适用一些广告场景等地方，可以带参数，参数基本没限制，在小程序中可以进行识别
-     * 但是path总长不能超过128字
+     * 但是path总长不能超过 128 字
      *
      * @param string $fileName
      * @param array $param
@@ -111,8 +108,9 @@ class App extends _Base
     public function getWxACode(string $fileName, array $param, int $width = 430)
     {
         $option = [];
-        $option['encode'] = 'html';
-//        $option['debug'] = false;
+        $option['encode'] = 'json';
+        $option['decode'] = 'buffer';
+        $option['buffer'] = $fileName;
 
         $data = [];
         $data['page'] = 'init';
@@ -121,26 +119,23 @@ class App extends _Base
         $data['width'] = $width;//280-1280
 
         $api = "/wxa/getwxacode?access_token={access_token}";
-        $rest = $this->Request($api, $data, $option);
+        $rest = $this->Request($api, $param + $data, $option);
         if (is_string($rest)) return $rest;
         if ($msg = $rest->error()) return $msg;
+
         $html = $rest->html();
         if ($html[0] === '{') {
             $json = json_decode($html, true);
             return $json['errmsg'] ?? $html;
         }
-        mk_dir($fileName);
-        $file = fopen($fileName, "w");
-        fwrite($file, $html);
-        fclose($file);
         return true;
     }
 
     /**
      * 获取小程序【二维码】，适用于需要的码数量较少的业务场景。通过该接口生成的小程序码，永久有效，有数量限制，详见获取二维码。
      * https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.createQRCode.html
-     */
-    /**
+     *
+     *
      * @param string $fileName
      * @param array $param
      * @param int $width
@@ -149,8 +144,9 @@ class App extends _Base
     public function createQRCode(string $fileName, array $param, int $width = 430)
     {
         $option = [];
-        $option['encode'] = 'html';
-//        $option['debug'] = false;
+        $option['encode'] = 'json';
+        $option['decode'] = 'buffer';
+        $option['buffer'] = $fileName;
 
         $data = [];
         $data['page'] = 'init';
@@ -159,7 +155,7 @@ class App extends _Base
         $data['width'] = $width;//280-1280
 
         $api = "/cgi-bin/wxaapp/createwxaqrcode?access_token={access_token}";
-        $rest = $this->Request($api, $data, $option);
+        $rest = $this->Request($api, $param + $data, $option);
         if (is_string($rest)) return $rest;
         if ($msg = $rest->error()) return $msg;
         $html = $rest->html();
@@ -167,12 +163,6 @@ class App extends _Base
             $json = json_decode($html, true);
             return $json['errmsg'] ?? $html;
         }
-
-        mk_dir($fileName);
-
-        $file = fopen($fileName, "w");
-        fwrite($file, $html);
-        fclose($file);
         return true;
     }
 

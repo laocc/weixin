@@ -77,11 +77,13 @@ abstract class Base extends Library
     public function setReturnBase(bool $set)
     {
         $this->returnBase = $set;
+        return $this;
     }
 
     public function setSaveDebug(bool $set)
     {
         $this->saveDebug = $set;
+        return $this;
     }
 
     /**
@@ -201,10 +203,15 @@ abstract class Base extends Library
         $http = new Http($option);
         $request = $http->data($data)->request($api);
         if ($this->returnBase) return $request;
-        if (!_CLI and $this->saveDebug or isset($option['debug'])) $this->debug([$api, $data, $option, $request]);
-
+        if (!_CLI and $this->saveDebug or isset($option['debug'])) {
+            $this->debug([$api, $data, $option, $request]);
+        }
         if ($err = $request->error()) return $err;
 
+        if ($option['encode'] === 'buffer') {
+
+            return $request;
+        }
         if ($option['encode'] === 'html') return $request;
 
         $value = $request->data();
