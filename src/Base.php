@@ -68,19 +68,19 @@ abstract class Base extends Library
         }
     }
 
-    public function setRedis(Redis $redis)
+    public function setRedis(Redis $redis): Base
     {
         $this->_Redis = $redis;
         return $this;
     }
 
-    public function setReturnBase(bool $set)
+    public function setReturnBase(bool $set): Base
     {
         $this->returnBase = $set;
         return $this;
     }
 
-    public function setSaveDebug(bool $set)
+    public function setSaveDebug(bool $set): Base
     {
         $this->saveDebug = $set;
         return $this;
@@ -121,7 +121,7 @@ abstract class Base extends Library
      * @param array $mpp
      * @return $this
      */
-    public function changeMpp(array $mpp)
+    public function changeMpp(array $mpp): Base
     {
         $conf = [];
         foreach ($mpp as $k => $v) {
@@ -139,26 +139,26 @@ abstract class Base extends Library
      * @param Platform $plat
      * @return $this
      */
-    public function changePlat(Platform $plat)
+    public function changePlat(Platform $plat): Base
     {
         $this->Platform = $plat;
         return $this;
     }
 
-    public function setFans(string $openID, string $nick)
+    public function setFans(string $openID, string $nick): Base
     {
         $this->openID = $openID;
         $this->nick = $nick;
         return $this;
     }
 
-    public function setOpenID(string $OpenID)
+    public function setOpenID(string $OpenID): Base
     {
         $this->openID = $OpenID;
         return $this;
     }
 
-    public function setNick(string $nick)
+    public function setNick(string $nick): Base
     {
         $this->nick = $nick;
         return $this;
@@ -170,7 +170,7 @@ abstract class Base extends Library
      * @return string
      * @throws Exception
      */
-    public function xml(array $xml, $notes = null)
+    public function xml(array $xml, $notes = null): string
     {
         return (new Xml($xml, $notes ?: 'xml'))->render(false);
     }
@@ -190,6 +190,7 @@ abstract class Base extends Library
         if ($cert and !isset($option['cert'])) $option['cert'] = $cert;
         if (!isset($option['type'])) $option['type'] = 'get';
         if (!isset($option['encode'])) $option['encode'] = 'json';
+        if (!isset($option['decode'])) $option['decode'] = $option['encode'];
         if (is_array($data) and $option['type'] !== 'upload') $data = json_encode($data, 256 | 64);
 
         $hasTry = false;
@@ -208,11 +209,7 @@ abstract class Base extends Library
         }
         if ($err = $request->error()) return $err;
 
-        if ($option['encode'] === 'buffer') {
-
-            return $request;
-        }
-        if ($option['encode'] === 'html') return $request;
+        if (($option['decode'] === 'html') or ($option['decode'] === 'buffer')) return $request;
 
         $value = $request->data();
         $check = $this->checkError($value);
@@ -273,9 +270,7 @@ abstract class Base extends Library
             return true;
 
         } else if ($errCode === 40125) {
-            $returnInfo = 'AppSecret(应用密钥)被修改，请立即重新配置';
-            $this->send_Warnings($returnInfo);
-            return $returnInfo;
+            return $this->send_Warnings('AppSecret(应用密钥)被修改，请立即重新配置');
 
         } else if ($errCode === 48001) {
             return '当前应用没有此接口权限';
@@ -334,7 +329,7 @@ abstract class Base extends Library
      * @param bool $isHack
      * @throws Exception
      */
-    public function load_CallBackIP($hack = [], $isHack = false)
+    public function load_CallBackIP($hack = [], bool $isHack = false)
     {
         $api = "/cgi-bin/getcallbackip?access_token={access_token}";
         $JsonStr = $this->Request($api);
@@ -355,7 +350,7 @@ abstract class Base extends Library
      * @return string
      * @throws Exception
      */
-    public function load_ShortUrl($url)
+    public function load_ShortUrl($url): string
     {
         $api = "/cgi-bin/shorturl?access_token={access_token}";
         $data = [];
@@ -404,13 +399,19 @@ abstract class Base extends Library
         return in_array($this->mpp['type'], $Disable) ? '公众号没有此接口权限' : false;
     }
 
-    //向管理员报警
-    public function send_Warnings($str)
+    /**
+     * 向管理员报警
+     *
+     * @param string $str
+     * @return array
+     */
+    public function send_Warnings(string $str): array
     {
         $msg = [];
         $msg['success'] = false;
         $msg['error'] = $str;
-        return $this;
+
+        return $msg;
     }
 
 

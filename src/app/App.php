@@ -4,7 +4,6 @@ namespace esp\weiXin\app;
 
 use esp\error\Error;
 use Exception;
-use function esp\helper\mk_dir;
 
 class App extends _Base
 {
@@ -56,14 +55,15 @@ class App extends _Base
      * 获取【小程序码】
      * 获取小程序码，适用于需要的码数量极多的业务场景。通过该接口生成的小程序码，永久有效，数量暂无限制。 更多用法详见 获取二维码。
      * https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.getUnlimited.html
+     *
      * 调用分钟频率受限(目前5000次/分钟，会调整)，如需大量小程序码，建议预生成。
      * 适用在固定只进入首页的场景，如用户分享，
-     * 因为不能带参数，参数只能放在scene里，而且scene值最长32字，且有些字符不能用，比如json里的双引号
+     * 因为不能带参数，参数只能放在scene里，而且scene值最长 32 字，且有些字符不能用，比如json里的双引号，还有百分号
      *
      * @param string $fileName
      * @param string $scene
      * @param array $params
-     * @return array|bool|string
+     * @return bool|string
      * @throws Error
      */
     public function getUnlimited(string $fileName, string $scene, array $params = [])
@@ -75,22 +75,15 @@ class App extends _Base
 
         $data = [];
         $data['page'] = 'init';//不能携带参数（参数请放在scene字段里）
-        $data['width'] = 240;//280-1280
+        $data['width'] = 200;//280-1280
         $data['scene'] = $scene;
 //        $data['is_hyaline'] = true;//默认是false，是否需要透明底色，为 true 时，生成透明底色的小程序
 
         $api = "/wxa/getwxacodeunlimit?access_token={access_token}";
         $rest = $this->Request($api, $params + $data, $option);
         if (is_string($rest)) return $rest;
-        if ($msg = $rest->error()) return $msg;
 
-        $html = $rest->html();
-        if ($html[0] === '{') {
-            $json = json_decode($html, true);
-            return $json['errmsg'] ?? $html;
-        }
-
-        return true;
+        return $rest->data();
     }
 
     /**
@@ -103,7 +96,7 @@ class App extends _Base
      * @param string $fileName
      * @param array $param
      * @param int $width
-     * @return array|bool|string
+     * @return bool|string
      */
     public function getWxACode(string $fileName, array $param, int $width = 430)
     {
@@ -121,14 +114,8 @@ class App extends _Base
         $api = "/wxa/getwxacode?access_token={access_token}";
         $rest = $this->Request($api, $param + $data, $option);
         if (is_string($rest)) return $rest;
-        if ($msg = $rest->error()) return $msg;
 
-        $html = $rest->html();
-        if ($html[0] === '{') {
-            $json = json_decode($html, true);
-            return $json['errmsg'] ?? $html;
-        }
-        return true;
+        return $rest->data();
     }
 
     /**
@@ -146,7 +133,7 @@ class App extends _Base
         $option = [];
         $option['encode'] = 'json';
         $option['decode'] = 'buffer';
-        $option['buffer'] = $fileName;
+        $option['buffer'] = $fileName;//写入文件
 
         $data = [];
         $data['page'] = 'init';
@@ -157,18 +144,14 @@ class App extends _Base
         $api = "/cgi-bin/wxaapp/createwxaqrcode?access_token={access_token}";
         $rest = $this->Request($api, $param + $data, $option);
         if (is_string($rest)) return $rest;
-        if ($msg = $rest->error()) return $msg;
-        $html = $rest->html();
-        if ($html[0] === '{') {
-            $json = json_decode($html, true);
-            return $json['errmsg'] ?? $html;
-        }
-        return true;
+
+        return $rest->data();
     }
 
 
     /**
      * 订阅物流消息
+     *
      * @param $openid
      * @param $receiver_phone
      * @param $waybill_id
@@ -181,8 +164,7 @@ class App extends _Base
     public function followWaybill($openid, $receiver_phone, $waybill_id, $trans_id, $goods_name, $goods_pic_url)
     {
         $option = [];
-        $option['encode'] = 'html';
-//        $option['debug'] = false;
+        $option['encode'] = 'json';
 
         $data = [];
         $data['openid'] = $openid;//不能携带参数（参数请放在scene字段里）
@@ -195,7 +177,6 @@ class App extends _Base
             ]
         ];
         $data['trans_id'] = $trans_id;
-//        $data['is_hyaline'] = true;
         $data = json_encode($data, 256 | 64);
 
         $api = "/cgi-bin/express/delivery/open_msg/follow_waybill?access_token={access_token}";

@@ -80,6 +80,7 @@ class Custom extends _Base implements Send
     /**
      * 下载用户发送的图片
      * https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/kf-mgnt/kf-message/getTempMedia.html
+     *
      * @param string $mediaID
      * @return array|mixed|string|null
      * @throws Exception
@@ -87,10 +88,14 @@ class Custom extends _Base implements Send
     public function media(string $mediaID)
     {
         $api = "/cgi-bin/media/get?access_token={access_token}&media_id={$mediaID}";
-        $option = ['type' => 'get', 'encode' => 'html'];
+        $option = [
+            'type' => 'get',
+            'encode' => 'buffer',
+            'decode' => 'buffer',
+        ];
         $req = $this->Request($api, null, $option);
-        if (isset($req->abnormal)) return 'data:image/png;base64,' . $req->abnormal;
-//        if ($req->error()) return $req->_message;
+        if (isset($req->_buffer)) return 'data:image/png;base64,' . base64_encode($req->_buffer);
+
         return json_decode($req->_html, true);
     }
 
