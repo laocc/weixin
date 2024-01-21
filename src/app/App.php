@@ -2,6 +2,7 @@
 
 namespace esp\weiXin\app;
 
+use esp\error\Error;
 use Exception;
 use function esp\helper\mk_dir;
 
@@ -61,10 +62,11 @@ class App extends _Base
      *
      * @param string $fileName
      * @param string $scene
-     * @param int $width
+     * @param array $params
      * @return array|bool|string
+     * @throws Error
      */
-    public function getUnlimited(string $fileName, string $scene, int $width = 430)
+    public function getUnlimited(string $fileName, string $scene, array $params = [])
     {
         $option = [];
         $option['encode'] = 'html';
@@ -72,10 +74,10 @@ class App extends _Base
 
         $data = [];
         $data['page'] = 'init';//不能携带参数（参数请放在scene字段里）
-        $data['width'] = $width;//280-1280
+        $data['width'] = 240;//280-1280
         $data['scene'] = $scene;
 //        $data['is_hyaline'] = true;
-        $data = json_encode($data, 256 | 64);
+        $data = json_encode($params + $data, 256 | 64);
 
         $api = "/wxa/getwxacodeunlimit?access_token={access_token}";
         $rest = $this->Request($api, $data, $option);
