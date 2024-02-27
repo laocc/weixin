@@ -31,6 +31,10 @@ final class Media extends _Base
 
 
     /**
+     * https://developers.weixin.qq.com/doc/offiaccount/Asset_Management/Adding_Permanent_Assets.html
+     *
+     * 小程序客服临时素材：https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/kf-mgnt/kf-message/uploadTempMedia.html
+     *
      * @param string $type
      * @param string $file
      * @param array $info
