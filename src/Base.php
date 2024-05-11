@@ -239,12 +239,12 @@ abstract class Base extends Library
     public function token(): string
     {
         if (isset($this->Platform)) {
-            if (isset($this->platAccessToken)) return $this->platAccessToken;
+//            if (isset($this->platAccessToken)) return $this->platAccessToken;
 
             $token = $this->Platform->appAccessToken();
             return $this->platAccessToken = $token['token'];
         } else {
-            if (isset($this->appAccessToken)) return $this->appAccessToken;
+//            if (isset($this->appAccessToken)) return $this->appAccessToken;
 
             $token = $this->load_AccessToken();
             return $this->appAccessToken = $token['token'];
@@ -310,13 +310,49 @@ abstract class Base extends Library
         $token = $this->Hash()->get("Access_Token_{$this->AppID}");
         if ($token) {
             if (is_string($token)) $token = unserialize($token);
+//            if (_CLI) print_r($token);
             if ($token['expires'] > time()) return $token;
         }
 
         $api = sprintf("/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", $this->mpp['appid'], $this->mpp['secret']);
         $dat = $this->Request($api);
         if (is_string($dat)) return $dat;
-        $val = ['token' => $dat['access_token'], 'expires' => intval($dat['expires_in']) + time() - 100];
+
+        $expire = intval($dat['expires_in']) + time() - 100;
+        $val = [
+            'token' => $dat['access_token'],
+            'expires' => $expire,
+            'datetime' => date('Y-m-d H:i:s', $expire),
+        ];
+        if (_CLI) print_r($val);
+        $this->Hash()->set("Access_Token_{$this->AppID}", $val);
+
+        return $val;
+    }
+
+    public function load_stableAccessToken()
+    {
+        $token = $this->Hash()->get("Access_Token_{$this->AppID}");
+        if ($token) {
+            if (is_string($token)) $token = unserialize($token);
+            if ($token['expires'] > time()) return $token;
+        }
+
+        $post = [
+            'grant_type' => 'client_credential',
+            'appid' => $this->mpp['appid'],
+            'secret' => $this->mpp['secret'],
+            'force_refresh' => false,
+        ];
+        $dat = $this->Request('/cgi-bin/stable_token', $post);
+        if (is_string($dat)) return $dat;
+
+        $expire = intval($dat['expires_in']) + time() - 100;
+        $val = [
+            'token' => $dat['access_token'],
+            'expires' => $expire,
+            'datetime' => date('Y-m-d H:i:s', $expire),
+        ];
         $this->Hash()->set("Access_Token_{$this->AppID}", $val);
 
         return $val;
