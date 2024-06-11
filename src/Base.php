@@ -131,6 +131,7 @@ abstract class Base extends Library
 
         $this->mpp = $conf;
         $this->AppID = $conf['appid'];
+//        $this->secret = $conf['secret'];
         return $this;
     }
 
