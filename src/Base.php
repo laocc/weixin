@@ -242,6 +242,7 @@ abstract class Base extends Library
         if (isset($this->Platform)) {
             $token = $this->Platform->appAccessToken();
         } else {
+            if (isset($this->appAccessToken)) return $this->appAccessToken;
             $token = $this->load_AccessToken();
         }
 
@@ -251,6 +252,11 @@ abstract class Base extends Library
         return $token['token'];
     }
 
+    public function setAppToken(string $token)
+    {
+        $this->appAccessToken = $token;
+        return $this;
+    }
 
     /**
      * 检查信息是否错误
