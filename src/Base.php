@@ -240,16 +240,14 @@ abstract class Base extends Library
     public function token(): string
     {
         if (isset($this->Platform)) {
-//            if (isset($this->platAccessToken)) return $this->platAccessToken;
-
             $token = $this->Platform->appAccessToken();
-            return $this->platAccessToken = $token['token'];
         } else {
-//            if (isset($this->appAccessToken)) return $this->appAccessToken;
-
             $token = $this->load_AccessToken();
-            return $this->appAccessToken = $token['token'];
         }
+
+        if (is_string($token)) return $token;
+
+        return $token['token'];
     }
 
 
