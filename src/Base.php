@@ -245,6 +245,7 @@ abstract class Base extends Library
             $token = $this->load_AccessToken();
         }
 
+        $this->debug($token);
         if (is_string($token)) return $token;
 
         return $token['token'];
