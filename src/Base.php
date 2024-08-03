@@ -23,6 +23,7 @@ abstract class Base extends Library
     protected string $platAccessToken;
     protected string $appAccessToken;
     private bool $returnBase = false;
+    private bool $returnCode = false;
     private bool $saveDebug = false;
 
     protected Platform $Platform;
@@ -77,6 +78,12 @@ abstract class Base extends Library
     public function setReturnBase(bool $set): Base
     {
         $this->returnBase = $set;
+        return $this;
+    }
+
+    public function setReturnCode(bool $set): Base
+    {
+        $this->returnCode = $set;
         return $this;
     }
 
@@ -224,6 +231,7 @@ abstract class Base extends Library
             if ($check === 'try_once') {
                 $check = "({$value["errcode"]}){$value["errmsg"]}-{$api}";
             }
+            if ($this->returnCode) return strval($value["errcode"]);
             return $check;
         }
 
@@ -299,6 +307,8 @@ abstract class Base extends Library
             return 'try_once';
 
         } else {
+            if ($this->returnCode) return strval($errCode);
+
             return "({$errCode}){$inArr["errmsg"]}";
         }
 
