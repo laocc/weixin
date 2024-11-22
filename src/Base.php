@@ -222,7 +222,7 @@ abstract class Base extends Library
         $value = $request->data();
         $check = $this->checkError($value);
         if ($check === 'try_once' and !$hasTry) {
-            if (_CLI) echo "{$api}\n";
+            if (_CLI) echo "try_once {$api}\n";
             $hasTry = true;
             goto tryOnce;
         }
