@@ -251,7 +251,7 @@ abstract class Base extends Library
             $token = $this->Platform->appAccessToken();
         } else {
             if (isset($this->appAccessToken)) return $this->appAccessToken;
-            $token = $this->load_AccessToken();
+            $token = $this->load_AccessToken(false);
         }
 
         $this->debug($token);
@@ -301,7 +301,7 @@ abstract class Base extends Library
 
         } elseif (in_array($errCode, [41001, 40001, 40014, 42001])) {
             //验证若出错,是否因为Token过期
-            $load = $this->load_AccessToken();
+            $load = $this->load_AccessToken(true);
             if (is_string($load)) return $load;
 
             return 'try_once';
@@ -321,8 +321,9 @@ abstract class Base extends Library
      * @return array|string
      * @throws Exception
      */
-    public function load_AccessToken()
+    public function load_AccessToken(bool $force = false)
     {
+        if ($force) goto force;
         $token = $this->Hash()->get("Access_Token_{$this->AppID}");
         if ($token) {
             if (is_string($token)) $token = unserialize($token);
@@ -330,6 +331,7 @@ abstract class Base extends Library
             if ($token['expires'] > time()) return $token;
         }
 
+        force:
         $api = sprintf("/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", $this->mpp['appid'], $this->mpp['secret']);
         $dat = $this->Request($api);
         if (is_string($dat)) return $dat;
