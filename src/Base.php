@@ -336,7 +336,7 @@ abstract class Base extends Library
         $dat = $this->Request($api);
         if (is_string($dat)) return $dat;
 
-        $expire = intval($dat['expires_in']) + time() - 100;
+        $expire = time() + intval($dat['expires_in']) - 1800;
         $val = [
             'token' => $dat['access_token'],
             'expires' => $expire,
