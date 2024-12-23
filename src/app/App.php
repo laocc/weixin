@@ -74,10 +74,22 @@ class App extends _Base
         $option['buffer'] = $fileName;
 
         $data = [];
-        $data['page'] = 'init';//不能携带参数（参数请放在scene字段里）
-        $data['width'] = 200;//280-1280
+        $data['page'] = $params['page'] ?? 'init';//不能携带参数（参数请放在scene字段里）
+        $data['width'] = $params['width'] ?? 200;//280-1280
         $data['scene'] = $scene;
-//        $data['is_hyaline'] = true;//默认是false，是否需要透明底色，为 true 时，生成透明底色的小程序
+        if (isset($params['color'])) {
+            $data['auto_color'] = true;
+            $data['line_color'] = $params['color'];
+            /**
+             * 默认值{"r":0,"g":0,"b":0} ；
+             * auto_color 为 false 时生效，使用 rgb 设置颜色
+             * 例如 {"r":"xxx","g":"xxx","b":"xxx"} 十进制表示
+             */
+        }
+
+        if (isset($params['hyaline'])) {
+            $data['is_hyaline'] = $params['hyaline'];//默认是false，是否需要透明底色，为 true 时，生成透明底色的小程序
+        }
 
         $api = "/wxa/getwxacodeunlimit?access_token={access_token}";
         $rest = $this->Request($api, $params + $data, $option);
@@ -106,10 +118,20 @@ class App extends _Base
         $option['buffer'] = $fileName;
 
         $data = [];
-        $data['page'] = 'init';
-//        $data['page'] = '/init?' . http_build_query($param);
-//        $data['page'] = json_encode($param, 256 | 64);
+        $data['page'] = $params['page'] ?? 'init';//能携带参数
         $data['width'] = $width;//280-1280
+        if (isset($params['color'])) {
+            $data['auto_color'] = true;
+            $data['line_color'] = $params['color'];
+            /**
+             * 默认值{"r":0,"g":0,"b":0} ；
+             * auto_color 为 false 时生效，使用 rgb 设置颜色
+             * 例如 {"r":"xxx","g":"xxx","b":"xxx"} 十进制表示
+             */
+        }
+        if (isset($params['hyaline'])) {
+            $data['is_hyaline'] = $params['hyaline'];//默认是false，是否需要透明底色，为 true 时，生成透明底色的小程序
+        }
 
         $api = "/wxa/getwxacode?access_token={access_token}";
         $rest = $this->Request($api, $param + $data, $option);
