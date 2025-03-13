@@ -248,7 +248,7 @@ final class Pay extends _Base
 
         //trade_type=JSAPI时此参数必传，用户在商户appid下的唯一标识。
         if ($type === 'JSAPI') $payInfo['openid'] = $data['openid'];
-        $payInfo['time_expire'] = date('YmdHis', time() + 7200);//有效期
+        $payInfo['time_expire'] = date('YmdHis', time() + ($data['ttl'] ?? 7200));//有效期
 
         $payInfo['attach'] = $data['attach'];        //选填 附加数据，在查询API和支付通知中原样返回，该字段主要用于商户携带订单的自定义数据
         $payInfo['sign'] = $this->createSign($payInfo, $config['token']);//签名，详见签名生成算法
