@@ -2,18 +2,29 @@
 
 namespace esp\weiXin\items;
 
+use esp\http\HttpResult;
+use Exception;
 use function esp\helper\str_rand;
 
 final class Pay extends _Base
 {
     public array $mch;
 
+    /**
+     * @param array $mch
+     * @return $this
+     */
     public function setMerchant(array $mch)
     {
         $this->mch = $mch;
         return $this;
     }
 
+    /**
+     * @param array $payment
+     * @return array|HttpResult|string
+     * @throws Exception
+     */
     public function refundPay(array $payment)
     {
         $notifyUrl = $payment['notify'] ?? $payment['notify_url'];
@@ -68,7 +79,7 @@ final class Pay extends _Base
      * @param string $code
      * @return string
      */
-    public function deCodeCryptRefund(string $code)
+    public function deCodeCryptRefund(string $code): string
     {
         return openssl_decrypt(base64_decode($code), "AES-256-ECB", md5($this->mch['token']), OPENSSL_RAW_DATA);
     }
@@ -79,7 +90,7 @@ final class Pay extends _Base
      * @param $shopID
      * @return string
      */
-    public function createQrCode($shopID)
+    public function createQrCode($shopID): string
     {
         $val = [];
         $val['appid'] = $this->AppID;//微信号
@@ -88,10 +99,9 @@ final class Pay extends _Base
         $val['time_stamp'] = time();
         $val['nonce_str'] = str_rand(32);
         $val['sign'] = $this->createSign($val, '');
-        $url = 'weixin://wxpay/bizpayurl?' . http_build_query($val);
         //weixin://wxpay/bizpayurl?appid=wx75ff6dd72d5edfcd&mch_id=1446344302&product_id=10&time_stamp=1489919446&nonce_str=93nuLPaVvrwBZ5pUFEGlO2xcyeK4TMSo&sign=24F6731E3C0D203F0474DD5C9FEC501F
         //转换成短连接
-        return $url;
+        return 'weixin://wxpay/bizpayurl?' . http_build_query($val);
     }
 
     /**
@@ -135,9 +145,9 @@ final class Pay extends _Base
     /**
      * H5调起支付API
      * @param array $data
-     * @return array|bool|mixed|string
+     * @return array|string
      */
-    public function getJsApiPay(array $data)
+    public function getJsApiPay(array $data): array|string
     {
         $unified = $this->UnifiedOrder('JSAPI', $data);//统一下单
         if (is_string($unified)) {
@@ -145,17 +155,24 @@ final class Pay extends _Base
             return $unified;
         }
 
+        return $this->paySign($unified['prepay_id'], $data['time']);
+    }
+
+    public function paySign(string $payPreID, int $time = null): array
+    {
+        if (is_null($time)) $time = time();
         $values = array();
         $values['appId'] = $this->mch['appid'];
-        $values['timeStamp'] = strval($data['time']);//这timeStamp中间的S必须是大写
+        $values['timeStamp'] = strval($time);//这timeStamp中间的S必须是大写
         $values['nonceStr'] = str_rand(30);//随机字符串，不长于32位。推荐随机数生成算法
-        $values['package'] = "prepay_id={$unified['prepay_id']}";
+        $values['package'] = "prepay_id={$payPreID}";
         $values['signType'] = 'MD5';
         $values['paySign'] = $this->createSign($values, $this->mch['token']);//生成签名
         return $values;
     }
 
-    public function getH5Pay(array $data)
+
+    public function getH5Pay(array $data): array|string
     {
         $unified = $this->UnifiedOrder('MWEB', $data);//统一下单
         if (is_string($unified)) {
@@ -175,9 +192,9 @@ final class Pay extends _Base
     /**
      * 调起APP支付
      * @param array $data
-     * @return array|bool|mixed|string
+     * @return array|string
      */
-    public function getAppPay(array $data)
+    public function getAppPay(array $data): array|string
     {
         $unified = $this->UnifiedOrder('APP', $data);//统一下单
         if (is_string($unified)) {
@@ -201,7 +218,7 @@ final class Pay extends _Base
      * 统一下单
      * @param array $data
      * @param string $type
-     * @return bool|mixed|string
+     * @return array|HttpResult|string
      * https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_1
      * https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_1
      *
@@ -276,9 +293,9 @@ final class Pay extends _Base
      * @param string $ordNumber
      * @param string|null $ordTansID
      * @return array|string
-     * @throws \Exception
+     * @throws Exception
      */
-    public function orderQuery(string $ordNumber, string $ordTansID = null)
+    public function orderQuery(string $ordNumber, string $ordTansID = null): array|string
     {
         $api = 'https://api.mch.weixin.qq.com/pay/orderquery';
         $data = [];
@@ -327,14 +344,21 @@ final class Pay extends _Base
      * @param null $key
      * @return bool
      */
-    public function checkSign($data, $key)
+    public function checkSign($data, $key): bool
     {
         $checkSign = $this->createSign($data, $key);
         return hash_equals($checkSign, $data['sign']);
     }
 
-    //生成签名
-    public function createSign(array $arrValue, string $key, string $type = 'md5')
+
+    /**
+     * 生成签名
+     * @param array $arrValue
+     * @param string $key
+     * @param string $type
+     * @return string
+     */
+    public function createSign(array $arrValue, string $key, string $type = 'md5'): string
     {
         ksort($arrValue);
         $string = $this->ToUrlParams($arrValue);
@@ -343,7 +367,7 @@ final class Pay extends _Base
         return $string;
     }
 
-    private function ToUrlParams($arrValue)
+    private function ToUrlParams($arrValue): string
     {
         $buff = [];
         foreach ($arrValue as $k => &$v) {
