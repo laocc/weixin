@@ -212,7 +212,7 @@ XML;
             $array_e = $xml->getElementsByTagName('Encrypt');
             $encrypt = $array_e->item(0)->nodeValue;
             return array(0, $encrypt);
-        } catch (\Exception|\Error $e) {
+        } catch (\Throwable $e) {
             return array(ErrorCode::$ParseXmlError, null);
         }
     }
