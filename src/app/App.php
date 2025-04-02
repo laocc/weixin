@@ -10,6 +10,38 @@ class App extends _Base
 
 
     /**
+     * 步骤1：需要将 button 组件 open-type 的值设置为 getPhoneNumber，当用户点击并同意之后，通过 bindgetphonenumber 事件获取回调信息；
+     *
+     * 步骤2：将 bindgetphonenumber 事件回调中的动态令牌code传到开发者后台，并在开发者后台调用微信后台提供的 phonenumber.getPhoneNumber 接口，消费code来换取用户手机号。每个code有效期为5分钟，且只能消费一次。
+     *
+     * 注：getPhoneNumber 返回的 code 与 wx.login 返回的 code 作用是不一样的，不能混用。
+     *
+     * 注意
+     * 从基础库2.21.2开始，对步骤2中换取手机号信息的方式进行了安全升级，上述为新方式使用指南。（旧方式目前可以继续使用，但建议开发者使用新方式，以增强小程序安全性）另外，新方式不再需要提前调用wx.login进行登录。
+     * 旧方法是直接解析出手机号
+     */
+    public function getPhone(string $openID, string $code)
+    {
+        $api = "/wxa/business/getuserphonenumber?access_token={access_token}";
+
+        $post = [];
+        $post['code'] = $code;
+        $post['openid'] = $openID;
+
+        $option = [];
+        $option['type'] = 'post';
+        $option['encode'] = 'json';
+
+        $risk = $this->Request($api, $post, $option);
+        if (is_string($risk)) {
+            return $risk;
+        } else {
+            return ['phone' => $risk['phone_info']['purePhoneNumber']];
+        }
+    }
+
+
+    /**
      * 读取风险等级，调用此接口必须在用户访问小程序的2小时内进行
      *
      * https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/safety-control-capability/riskControl.getUserRiskRank.html
