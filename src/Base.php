@@ -212,7 +212,7 @@ abstract class Base extends Library
         $http = new Http($option);
         $request = $http->data($data)->request($api);
         if ($this->returnBase) return $request;
-        if (!_CLI and $this->saveDebug or isset($option['debug'])) {
+        if (!_CLI and ($this->saveDebug or isset($option['debug']))) {
             $this->debug([$api, $data, $option, $request]);
         }
         if ($err = $request->error()) return $err;
@@ -273,6 +273,9 @@ abstract class Base extends Library
      * @param array $allowCode
      * @return bool|mixed|string
      * @throws Exception
+     *
+     * https://developers.weixin.qq.com/doc/oplatform/Return_codes/Return_code_descriptions_new.html#%E5%85%B6%E4%BB%96%E9%94%99%E8%AF%AF%E7%A0%81
+     *
      */
     protected function checkError(array $inArr, array $allowCode = [])
     {
@@ -286,14 +289,14 @@ abstract class Base extends Library
         } else if ($errCode === 40125) {
             return $this->send_Warnings('AppSecret(应用密钥)被修改，请立即重新配置');
 
+        } else if ($errCode === 45047) {
+            return '客服接口下行条数超过上限(5条)';
+
         } else if ($errCode === 48001) {
             return '当前应用没有此接口权限';
 
         } else if ($errCode === 45015) {
             return '此用户与公众号交互时间超过48小时';
-
-        } else if ($allowCode === ['all']) {
-            return true;
 
         } else if (in_array($errCode, $allowCode)) {
             //无错，或对于需要返回空值的错误代码
@@ -303,8 +306,10 @@ abstract class Base extends Library
             //验证若出错,是否因为Token过期
             $load = $this->load_AccessToken(true);
             if (is_string($load)) return $load;
-
             return 'try_once';
+
+        } else if ($allowCode === ['all']) {
+            return true;
 
         } else {
             if ($this->returnCode) return strval($errCode);
