@@ -53,7 +53,7 @@ final class Media extends _Base
         }
 
         $option = [];
-        $option['type'] = 'upload';
+        $option['method'] = 'upload';
 
         $file = realpath($file);
         $name = pathinfo($file, PATHINFO_BASENAME);
