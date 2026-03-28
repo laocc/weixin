@@ -194,12 +194,12 @@ abstract class Base extends Library
     public function Request(string $url, $data = null, array $option = [], $cert = null)
     {
         if (empty($url)) return 'empty API';
-        if ($data and !isset($option['type'])) $option['type'] = 'post';
+        if ($data and !isset($option['method'])) $option['method'] = 'post';
         if ($cert and !isset($option['cert'])) $option['cert'] = $cert;
-        if (!isset($option['type'])) $option['type'] = 'get';
+        if (!isset($option['method'])) $option['method'] = 'get';
         if (!isset($option['encode'])) $option['encode'] = 'json';
         if (!isset($option['decode'])) $option['decode'] = $option['encode'];
-        if (is_array($data) and $option['type'] !== 'upload') $data = json_encode($data, 256 | 64);
+        if (is_array($data) and $option['method'] !== 'upload') $data = json_encode($data, 256 | 64);
 
         $hasTry = false;
         tryOnce:
