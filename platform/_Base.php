@@ -114,8 +114,8 @@ class _Base extends Library
      */
     public function Request($url, $data = null, array $option = [], $cert = null)
     {
-        $option += ['type' => 'get', 'encode' => 'json'];
-        if ($data) $option['type'] = 'post';
+        $option += ['method' => 'get', 'encode' => 'json'];
+        if ($data) $option['method'] = 'post';
         if ($cert) $option['cert'] = $cert;
         if (empty($url)) return 'empty API';
 

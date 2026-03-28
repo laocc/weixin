@@ -7,7 +7,7 @@ class Express extends _Base
     public function company()
     {
         $api = "/cgi-bin/express/delivery/open_msg/get_delivery_list?access_token={access_token}";
-        $val = $this->Request($api, '{}', ['type' => 'post']);
+        $val = $this->Request($api, '{}', ['method' => 'post']);
 
         return array_combine(
             array_column($val['delivery_list'], 'delivery_id'),

@@ -59,7 +59,7 @@ final class Pay extends _Base
         $api = 'https://api.mch.weixin.qq.com/secapi/pay/refund';
         $option = [];
         $option['encode'] = 'xml';
-        $option['type'] = 'post';
+        $option['method'] = 'post';
         $option['cert'] = $this->mch['cert'];
 //        $option['cert'] = ['cert' => $config['cert.cert'], 'key' => $config['cert.key']];
 
@@ -275,7 +275,7 @@ final class Pay extends _Base
         $api = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
         $option = [];
         $option['encode'] = 'xml';
-        $option['type'] = 'post';
+        $option['method'] = 'post';
         $option['cert'] = $config['cert'];
 
         $content = $this->Request($api, $payInfo, $option);
@@ -313,7 +313,7 @@ final class Pay extends _Base
 
         $option = [];
         $option['encode'] = 'xml';
-        $option['type'] = 'post';
+        $option['method'] = 'post';
 
         $content = $this->Request($api, $data, $option);
         if (!is_array($content)) return 'Q:订单查询-' . $content;

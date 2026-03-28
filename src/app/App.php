@@ -29,7 +29,7 @@ class App extends _Base
         $post['openid'] = $openID;
 
         $option = [];
-        $option['type'] = 'post';
+        $option['method'] = 'post';
         $option['encode'] = 'json';
 
         $risk = $this->Request($api, $post, $option);
@@ -65,7 +65,7 @@ class App extends _Base
         $post['is_test'] = false;
 
         $option = [];
-        $option['type'] = 'post';
+        $option['method'] = 'post';
         $option['encode'] = 'json';
 
         $value = [];
@@ -251,7 +251,7 @@ class App extends _Base
         $post['add_bonus'] = $param['add_bonus'];
 
         $option = [];
-        $option['type'] = 'post';
+        $option['method'] = 'post';
         $option['encode'] = 'json';
 
         $api = "/card/membercard/updateuser?access_token={access_token}";

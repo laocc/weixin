@@ -89,7 +89,7 @@ class Custom extends _Base implements Send
     {
         $api = "/cgi-bin/media/get?access_token={access_token}&media_id={$mediaID}";
         $option = [
-            'type' => 'get',
+            'method' => 'get',
             'encode' => 'buffer',
             'decode' => 'buffer',
         ];
