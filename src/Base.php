@@ -37,7 +37,7 @@ abstract class Base extends Library
      * @param Platform|null $platform
      * @throws Error
      */
-    public function _init(array $data, Platform $platform = null)
+    public function _init(array $data, ?Platform $platform = null)
     {
         $conf = [];
         foreach ($data as $k => $v) {
@@ -100,7 +100,7 @@ abstract class Base extends Library
      * @return RedisHash
      * @throws Error
      */
-    public function Hash(Redis $redis = null): RedisHash
+    public function Hash(?Redis $redis = null): RedisHash
     {
         if (isset($this->_Hash)) return $this->_Hash;
 

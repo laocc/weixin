@@ -202,7 +202,7 @@ class _Base extends Library
      * @param string|null $appID
      * @return array|mixed|string
      */
-    public function getAllAuthorizerMppApp(string $appID = null)
+    public function getAllAuthorizerMppApp(?string $appID = null)
     {
         $this->debug($this->AppID);
         $all = $this->listApp();

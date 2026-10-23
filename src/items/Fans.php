@@ -156,7 +156,7 @@ final class Fans extends _Base
      * @param string|null $state
      * @return bool|string
      */
-    private function sign_url(string $state = null)
+    private function sign_url(?string $state = null)
     {
         $token = md5(date('Ymd') . $this->AppID);
         if (is_null($state)) return $token;

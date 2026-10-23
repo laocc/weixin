@@ -158,7 +158,7 @@ final class Pay extends _Base
         return $this->paySign($unified['prepay_id'], $data['time']);
     }
 
-    public function paySign(string $payPreID, int $time = null): array
+    public function paySign(string $payPreID, ?int $time = null): array
     {
         if (is_null($time)) $time = time();
         $values = array();
@@ -295,7 +295,7 @@ final class Pay extends _Base
      * @return array|string
      * @throws Exception
      */
-    public function orderQuery(string $ordNumber, string $ordTansID = null): array|string
+    public function orderQuery(string $ordNumber, ?string $ordTansID = null): array|string
     {
         $api = 'https://api.mch.weixin.qq.com/pay/orderquery';
         $data = [];

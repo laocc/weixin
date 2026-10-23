@@ -268,7 +268,7 @@ class Platform extends _Base
      * @return string|array
      * @throws Exception
      */
-    public function acceptGrantEvent(string $input = null, array $get = [])
+    public function acceptGrantEvent(?string $input = null, array $get = [])
     {
         if (empty($input)) $input = file_get_contents("php://input");
         if (empty($input)) return 'null';

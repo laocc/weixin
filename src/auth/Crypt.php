@@ -34,7 +34,7 @@ final class Crypt
      * @param string|null $nonce
      * @return int
      */
-    public function encode(string $text, string $timeStamp = null, string $nonce = null)
+    public function encode(string $text, ?string $timeStamp = null, ?string $nonce = null)
     {
         $errCode = $this->encryptMsg($text, $timeStamp, $nonce, $encryptMsg);
         if ($errCode !== 0) return $errCode;
